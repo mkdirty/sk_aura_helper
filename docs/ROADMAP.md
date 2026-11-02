@@ -235,6 +235,31 @@ To make "find gaps and fix them" workable:
   lewd-scene switches.
 - Storage: SQLite for publishing and UI; in-memory graph or Datalog for recursive queries.
 
+#### Symbols (decided 2026-11-02)
+
+A symbols database, built alongside the cross-reference index (which supplies the usage data):
+
+- **Generated `symbols.json`, rebuilt every run** from System.json and the other data files: kind,
+  ID, the author's name verbatim, flags (unused, `-- Section` header), and where it's referenced.
+  Diffing it between versions matters: a renamed or newly used switch hints that its meaning
+  changed.
+- **The ID is the canonical key, and the author's name is kept verbatim.** No renamed identifiers
+  like `switch.no_collar`: they'd add a translation step between our output and the source,
+  the debug menu (F9 shows IDs), harness logs and the community. Names also change between
+  versions while IDs don't. Printer and walkthrough references stay `S22 noCollar` /
+  `{{switch:22}}`.
+- **A separate annotation overlay for knowledge:** descriptions, categories (corruption-related,
+  per-day, deadline), corrections (misspellings), and public display labels for the walkthrough.
+  Keyed by ID, with provenance, part of the annotation layer below.
+- **Scratch and argument slots aren't global symbols.** `tmp*`, `mapTmp*`, V650/V651 as
+  `Obtain_Item` arguments: "V650 is CE785's itemId argument" is a call-site fact from dataflow, not
+  a name.
+
+Facts behind this (event commands and page conditions, scripts not yet counted): every switch
+and variable used directly is named; all 479 unnamed switches and 519 unnamed variables are unused
+that way; names are unique apart from one duplicate `-- Mental World` header. One header-named
+variable *is* used, which is worth a look.
+
 ### 5. Day model and reachability
 
 - Model CE11/CE12/Map002: day transitions, per-day resources, deadlines, the Reality clock.
@@ -266,6 +291,7 @@ To make "find gaps and fix them" workable:
 8. **Stable anchors:** reference things by (map, event id, page, hash of command subtree/text) with
    fuzzy re-matching on update. Command indices shift between versions.
 9. **Annotation layer with provenance,** keyed to those anchors so it breaks loudly on change.
+   Includes the symbol overlay (descriptions, categories, display labels; see Symbols).
 10. **Snapshot tests** on pipeline outputs.
 11. **Instrumentation mod** for recording real play (routes), not primary ground truth.
 
@@ -276,7 +302,8 @@ Language: TypeScript, so the game's own JS loads directly.
 1. Kernel: loaders and headless harness
 2. Whole-project decoder + pretty-printer + coverage report (one pass), then CFG builder
 3. Call graph and taint report
-4. Cross-reference index with argument propagation ("where is item X")
+4. Cross-reference index with argument propagation ("where is item X"), plus the generated
+   symbols database
 5. Day model, fuzzed against the harness
 6. Requirement slicing, then routing bounds
 7. Offline map render and public site (can start any time after step 1)
