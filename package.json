@@ -14,7 +14,8 @@
     "game": "./game/Game",
     "harness": "tsx src/cli/harness.ts",
     "typecheck": "tsc",
-    "test": "vitest run"
+    "test": "vitest run",
+    "print": "tsx src/cli/print.ts"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",

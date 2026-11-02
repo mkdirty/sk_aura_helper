@@ -1,0 +1,167 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`reference outputs (hand-checked against the raw data) > CE11 endDay 1`] = `
+"=== CE11 endDay (none) ===
+    if V188 intro == -1:
+        if js($gameParty.members().length > 1):
+            if js($gameParty.inBattle()):
+                if S23 usedCollar is OFF:
+                    if S709 reverseSummoningRitual is ON:
+                        if V1216 souldust >= 5:
+                            label "END_DAY"
+                    say: To protect her party members, Aura struggles for her collar and...!
+                    js: $gameTemp._reservedGameOverCommonEvent = false;
+                    Force Action(subjectType=1, subject=1, skillId=4, targetIndex=-2)
+                    Show Animation(character=player, animationId=animation 53 "Power up 3", wait=true)
+                    exit event
+    if S13 endDayIfDefeat is ON:
+        if S65 disableReviveLeader is OFF:
+            S13 endDayIfDefeat = OFF
+        js: $gameTemp._reservedGameOverCommonEvent = false;
+        exit event
+    if S172 inMountainreach is ON:
+        S172 inMountainreach = OFF
+        call CE150 progressLegsOfSlothWithCutscenes
+        js: $gameTemp._reservedGameOverCommonEvent = false;
+        exit event
+    if V188 intro == -1:
+        if js($gameParty.members().length == 1):
+            if js($gameParty.inBattle()):
+                if S23 usedCollar is OFF:
+                    if S709 reverseSummoningRitual is ON:
+                        if S710 souldust is OFF:
+                            if js($gameParty.leader().actorId != 1):
+                                Play SE(audio="Up1")
+                                Tint Screen(tone=[255,255,255,0], duration=30, wait=true)
+                                js: $gameTroop.members()[0].hide()
+                                enemy #1 removeState(stateId=133)
+                                enemy #1 appear()
+                                call CE850 SwitchToAura
+                                Tint Screen(tone=[0,0,0,0], duration=30, wait=false)
+                            say: To protect her party members, Aura struggles for her collar and...!
+                            js: $gameTemp._reservedGameOverCommonEvent = false;
+                            Force Action(subjectType=1, subject=1, skillId=4, targetIndex=-2)
+                            Show Animation(character=player, animationId=animation 53 "Power up 3", wait=true)
+                            exit event
+        label "END_DAY"
+        Fadeout Screen()
+        if S709 reverseSummoningRitual is ON:
+            V1217 defeatsInRitual += 1
+            S710 souldust = OFF
+            S712 processRitualDefeat = ON
+        S604 inUndergroundCity = OFF
+        S606 disguised = OFF
+        if js(AuraMZ.Deluxe.deluxeConsole):
+            call CE363 RESTORE_COSTUME_AURA
+        else:
+            call CE371 SET_ARMOR_COSTUME
+            call CE381 SET_PONYTAIL_HAIR
+        call CE25 clean
+        transfer to Map053 WorldEvents (8, 6) no fade
+        call CE883 Progress_Books
+        call CE8 checkAutoCorrupts
+        V10 willpower = V11 maxWillpower
+        recover all: actor 1 "Aura"
+        recover all: actor 2 "Charlotte"
+        recover all: actor 3 "John"
+        recover all: actor 4 "Paul"
+        recover all: actor 16 "Desmond"
+        party remove actor 2 "Charlotte"
+        party remove actor 3 "John"
+        party remove actor 4 "Paul"
+        party remove actor 16 "Desmond"
+        S11 noTeleport = ON
+        S23 usedCollar = OFF
+        S24 summonedSlime = OFF
+        S27 fedSlime = OFF
+        S43 alchemistIngredientDiscount = OFF
+        S44 curseTrapBarrier = OFF
+        S45 louiseIngredientDiscount = OFF
+        S704 brothelWorkedToday = OFF
+        S94 firstDayEndingSex = OFF
+        S67 triggerLewdScene = OFF
+        plugin auramz/selfswitches_utils::setExternalSelfSwitch(mapID="155", eventID="5", selfswitch="D", value="false")
+        party remove actor 11 "Slime"
+        call CE146 endOfDayEventProgress
+        call CE145 endOfDayRespawn
+        call CE18 clearTemporaryEffects
+        call CE28 passiveEXPGain
+        party remove actor 1 "Aura"
+        recover all: actor 5 "Alicia"
+        if S709 reverseSummoningRitual is ON:
+            if V1216 souldust < 5:
+                if S188 killedRoland is OFF:
+                    V622 endingType = 6
+                    V424 epilogueStage = 1
+                    S80 epilogue = ON
+                    Fadeout BGM(seconds=1)
+                    call CE362 SAVE_COSTUME_AURA
+                    call CE378 SET_LEWD_PET_COSTUME
+                    call CE386 SET_HIGH_PONYTAIL_HAIR
+                    transfer to Map053 WorldEvents (8, 6) facing down
+                    exit event
+        if V624 difficulty >= 1:
+            if V571 corruptionSpeed == 3:
+                V571 corruptionSpeed = 2
+            if V571 corruptionSpeed == 2:
+                if js(!$gameSelfSwitches.value([22, 13, 'A'])):
+                    V571 corruptionSpeed = 1
+        if V571 corruptionSpeed == 1:
+            V32 dayCorruption = V31 day
+            V32 dayCorruption %= 2
+            if V32 dayCorruption == 0:
+                say: The curse is growing stronger! (+1 Corruption)
+                V2 corruption += 1
+        else:
+            if V571 corruptionSpeed == 3:
+                V32 dayCorruption = V31 day
+                V32 dayCorruption %= 2
+                if V32 dayCorruption == 0:
+                    V2 corruption += 1
+                    say: The curse is growing stronger! (+1 Corruption)
+                else:
+                    V2 corruption += 2
+                    say: The curse is growing stronger! (+2 Corruption)
+            else:
+                say: The curse is growing stronger! (+1 Corruption)
+                V2 corruption += 1
+    js: $gameTemp._reservedGameOverCommonEvent = false;
+"
+`;
+
+exports[`reference outputs (hand-checked against the raw data) > Map265/E8 François: choices, labels, jumps, item select 1`] = `
+"=== E8 "François" at (13, 14) ===
+--- page 0: action button, same as characters, image Rich_People1#7 ---
+    label "beginning"
+    V39 expression = 0
+    call CE64 SHOW_AURA
+    say Aura: (François, the son of the victim...)
+    choose (default 2, cancel → 2):
+        when 0 "Talk.":
+            say François:
+                | There's nothing for us to talk about now. Go and investigate...
+                | find the one that slaughtered my father.
+            jump to "beginning"
+        when 1 "Present Evidence.":
+            label "present"
+            plugin auramz/advanced_item_select::addItemFilter(filter="item.meta.evidence")
+            V36 tmp = select item (item type 2)
+            if V36 tmp == 0:
+                jump to "beginning"
+            else:
+                call CE158 reactToEvidence
+        when 2 "Leave.":
+            call CE62 HIDE
+            exit event
+    call CE62 HIDE
+    jump to "present"
+--- page 1: action button, same as characters, image Rich_People1#7; when V260 nothingButTheTruth >= 12 ---
+    say François: Ah, detective. Are you ready to hear my information?
+    choose (default 1, cancel → 1):
+        when 0 "Listen to François.":
+            V260 nothingButTheTruth += 1
+            transfer to Map266 Upper Floor (9, 8) facing left
+        when 1 "Not yet.":
+            pass
+"
+`;

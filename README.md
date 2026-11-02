@@ -10,6 +10,8 @@ player-facing resources: an interactive map, a walkable decision graph, and so o
 | `game/` | Submodule: private repo holding the game as shipped, minus vendored and non-game files (below). Read-only extraction input; has its own `.gitignore`/`.gitattributes`. |
 | `vendor.json` | Pinned, freely downloadable parts of the game (URL + SHA-256 + file mapping). |
 | `scripts/vendor.mjs` | Downloads, verifies, and installs those into `game/`. |
+| `src/data/` | Static access to the game's data files. |
+| `src/events/` | Event command decoder, pretty-printer and coverage report (see below). |
 | `src/harness/` | Headless game engine: runs the game's own code in Node (see below). |
 | `src/cli/` | Command-line entry points. |
 | `test/` | Vitest suite (`npm test`). |
@@ -30,6 +32,26 @@ pass `-- --force` to overwrite everything.
 
 Development: `npm install`, then `npm test` and `npm run typecheck`. The game directory defaults to
 `gameDir` in `vendor.json`; override it with `SKA_GAME_DIR`.
+
+## Event decoder and pretty-printer
+
+`src/events/` decodes every event command list in the game (map event pages, common events, troop
+pages) into structured ops, then renders them as readable pseudo-code with names resolved. Blocks
+are delimited by indentation, as the engine executes them. One pass also produces a coverage report:
+**gaps** (where the decoder may be wrong: unknown codes, unexpected parameter shapes) ranked by
+frequency, data **anomalies**, plugin commands (and whether they're registered at runtime), script
+counts, and engine commands that plugins override.
+
+```sh
+npm run print                       # everything → out/events/ (gitignored), plus coverage.txt/json
+npm run print -- ce 11              # one common event to stdout
+npm run print -- map 265 8          # one map event (or the whole map without the event id)
+npm run print -- troop 5
+npm run print -- ce 11 --text first # dialogue: full (default), first line, or none
+```
+
+The test suite fails if a full decode has any gaps, so a game update that introduces a new
+command shape gets flagged. CE11 and Map265/E8 are hand-checked reference outputs (snapshots).
 
 ## Headless harness
 

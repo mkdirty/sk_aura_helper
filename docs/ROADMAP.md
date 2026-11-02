@@ -192,6 +192,32 @@ lost" assumption.
 - Semantic operations per command (`GiveItem`, `SetSwitch`, `Transfer`, `CallCommon`, …).
 - Page conditions as guards, with page-priority (later pages hide earlier ones).
 
+#### Decision: decode the whole project, not one event (2026-11-02)
+
+The pretty-printer is built over **every event command list** (map pages, common events, troop
+pages) from the start, not scoped to one event like CE11. The format is uniform, so whole-project
+costs about the same, and scoping invites overfitting. A full dump is useful in its own right: it's
+greppable game logic, and diffing dumps between versions is a free logic changelog.
+
+To make "find gaps and fix them" workable:
+
+- **Decode, then render.** One pass decodes commands into a structured form; the printer is a thin
+  renderer on top. Command meanings live in the decoder, which the CFG and cross-reference index
+  reuse. They don't live in string formatting.
+- **Gaps are counted, not eyeballed.** The same pass produces a coverage report ranked by frequency:
+  unknown command codes, unexpected parameter shapes, unregistered plugin commands, unparsed
+  scripts. The work loop is: re-run, look at the top of the report, fix.
+- **A gap has a definition.** A generic fallback (plugin command shown as name + key=value args,
+  script shown verbatim) is acceptable output, not a gap. A gap is something that can't be
+  rendered even generically, or a decoding we know is wrong. Gaps are worked by frequency.
+- **Hand-checked reference outputs** catch silent misreadings, which a printer never flags: CE11
+  `endDay` first, plus an event with choices and labels, as snapshot tests.
+- **Boundary:** event command lists only. JS in note tags, Compendium, plugin parameters and inline
+  `\js<…>` text is out of scope for this tool, so coverage numbers don't overstate.
+- **Output:** deterministic (stable ordering, no timestamps) so version diffs are real, written to a
+  gitignored directory (regenerable). Only reference snapshots are committed. Dialogue (~95k
+  commands) can be collapsed so logic stays readable.
+
 ### 3. JavaScript and plugin commands
 
 - One table of every JS snippet from all surfaces, with provenance.
@@ -226,8 +252,10 @@ lost" assumption.
 
 ## Bootstrapping infrastructure
 
-1. **Pretty-printer** with names and author comments.
-2. **Coverage reports:** commands, plugin-command keys and JS snippets understood, ranked unknowns.
+1. **Pretty-printer** over the whole project, with names and author comments (see the decision under
+   Event decoder).
+2. **Coverage reports:** produced by the same pass; commands, plugin-command keys and JS snippets
+   understood, ranked unknowns.
 3. **Harness REPL:** load a save, do something, diff switches/variables/party/self switches/quests.
    Replaces a separate save differ.
 4. **Differential fuzzing:** run CEs and pages from sampled states in the harness and compare
@@ -246,14 +274,13 @@ Language: TypeScript, so the game's own JS loads directly.
 ## Order
 
 1. Kernel: loaders and headless harness
-2. Pretty-printer and CFG builder
+2. Whole-project decoder + pretty-printer + coverage report (one pass), then CFG builder
 3. Call graph and taint report
-4. Coverage report
-5. Cross-reference index with argument propagation ("where is item X")
-6. Day model, fuzzed against the harness
-7. Requirement slicing, then routing bounds
-8. Offline map render and public site (can start any time after step 1)
-9. Walkthrough linter and instrumentation mod
+4. Cross-reference index with argument propagation ("where is item X")
+5. Day model, fuzzed against the harness
+6. Requirement slicing, then routing bounds
+7. Offline map render and public site (can start any time after step 1)
+8. Walkthrough linter and instrumentation mod
 
 ### First milestone
 
@@ -263,7 +290,17 @@ Language: TypeScript, so the game's own JS loads directly.
    pass. The chain then reaches Map020's battle test, which needs `Scene_Battle` (not emulated
    yet). Tests start from new game + CE16 `initGame` + Aura in the party, an approximation of the
    author's "game in progress" launch via CE5 `startTest` → Map019 hub.
-3. `npm run print -- ce 11`: pretty-print `endDay` with names.
+3. ✅ `npm run print`: decodes all 23,748 lists (458,065 commands) in about 2s with 0 gaps; CE11
+   `endDay` and Map265/E8 are hand-checked reference snapshots. Getting there surfaced:
+   - **109 "Skip" is a block** (109 … 409) whose body never runs: dead code that analysis must
+     ignore (e.g. CE163, CE308, CE574).
+   - **The engine delimits blocks by indentation only**; terminators and closers are cosmetic.
+     Map271/E28 is missing a 412 and still runs fine, so it's reported as an anomaly.
+   - Map158/E1 `PROTECTED_SI_FROM_EXCLUDE` is a fake event of 394 two-parameter Show Picture
+     commands that keeps images from being excluded at deployment. Not logic.
+   - Analytics plugin commands are registered only when telemetry is on.
+   - Labels/jumps cross block boundaries (Map265/E8 jumps into a choice branch), which confirms
+     the CFG is needed.
 4. One query: writers of V31/V2/V3/V19 (direct and via call graph) as JSON, with a snapshot test.
 
 ## Open (deferred) questions
