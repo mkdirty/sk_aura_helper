@@ -18,7 +18,7 @@ for how the tools work, and [GAME-NOTES.md](GAME-NOTES.md) for what we know abou
 | 2 | Whole-project decoder, pretty-printer, decoder coverage | ✅ done |
 | 3 | Effects per command, cross-reference index (`where`), symbols | ✅ done |
 | 4 | Runtime cross-check of the index against the harness | ✅ done |
-| 5 | Remaining item/skill sources: crafting, books (and other unanalyzed plugins) | next |
+| 5 | Remaining item/skill sources: crafting, books (and other unanalyzed plugins) | crafting, books done; blessing, NG+ left |
 | 6 | Control-flow graph; requirement tracing ("earliest X"); taint report (what transitively writes corruption, lewdness, vice, mental changes) | planned |
 | 7 | Day model, checked against the harness | planned |
 | 8 | Reachability and routing bounds (lower bound vs a concrete route) | planned |
@@ -38,15 +38,15 @@ is the user's call.
 | --- | --- |
 | Harness | Boots in ~0.25s with all 143 plugins; runs common events and map pages; all 7 Map050 author tests pass |
 | Decoder | 23,748 lists / 458,065 commands in ~2s, **0 gaps**, 2 anomalies (Map271/E28); CE11 and Map265/E8 are hand-checked snapshots |
-| Index | ~109k references in ~2.5s; 50+ plugin commands modelled, ~60 checked to have no effect |
+| Index | ~109k references in ~2.5s; 50+ plugin commands modelled (incl. crafting, books), ~60 checked to have no effect |
 | Cross-check | **0 unexplained** on every entry point (first full run: 3,502). Pages: 10,738 runs, 41,917 changes (31,055 explained, 10,786 visited-map, 76 dynamic), ~28 min. Common events: 551 runs, 1,703 changes (1,605 / 80 / 18), ~5s |
-| Tests | 22 passing (`npm test`, ~3s) |
+| Tests | 26 passing (`npm test`, ~3s) |
 
 ## Next steps
 
-1. **Crafting recipes and book reading** (`TLB_SKACraftMenu:openScene`, `books:readBook`): real
-   item and skill sources, currently unanalyzed. Both plugins read item notes, so they're
-   derivable. Completes "where can I get X".
+1. **Blessing menu and NG+ skills** (`TLB_SKABlessMenu:openScene`, `newgame_plus_skills:*`):
+   the last unanalyzed plugin sources. Blessing turns items into blessed variants; NG+ skills
+   depend on the previous playthrough, so they may only need describing.
 2. **Control-flow graph and requirement tracing:** the step toward "earliest I can learn Fire I".
    Labels and jumps cross blocks (Map265/E8 jumps into a choice branch); page priority makes lower
    pages missable.
@@ -72,7 +72,7 @@ is the user's call.
   They should be excluded from "content" and the map graph; decide when building those.
 - **Unanalyzed** (`npm run where -- unanalyzed`): ~420 non-constant call arguments (mostly
   runtime-chosen recollection maps and selected items), scripts with computed ids, and the
-  crafting/blessing/books/NG+ plugin commands.
+  blessing/NG+ plugin commands.
 - **Not analyzed yet:** JS in note tags (`<enable condition:>`), plugin parameters, text escapes
   (`\V[n]`, `\js<…>`), Compendium conditions; battle-only state (troop pages are indexed but
   battles don't run in the harness).

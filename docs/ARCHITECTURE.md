@@ -73,7 +73,16 @@ the event actually runs.
   5. **Inline local calls** (`callLocalEventInline`) re-attribute the called page's "this event"
      effects to the caller.
   6. **Database refs** (`database.ts`): class learnings, item/skill effects, skill-granting
-     traits, enemy drops (effect and trait codes from the engine's constants).
+     traits, enemy drops (effect and trait codes from the engine's constants), and what finishing
+     each book does.
+- **Books** (`books.ts`): parses item note tags as the engine does and derives each book's
+  completion effects (learn/forget skill, willpower). They appear twice: as database refs on the
+  book item (Aura's path: the item runs CE607/CE608), and on `books:readBook` (the companions'
+  path; every book applies, since which one is assigned is runtime state). Parameter gains aren't
+  modelled, like the engine's Change Parameter: there's no parameter entity.
+- **Crafting** (`TLB_SKACraftMenu:openScene` handler): per recipe, the target item is "crafted
+  (into stock V…)", ingredients are lost, the stock variable is written, and the success switch
+  is set. The target is a write in the same sense as "shop sells": a source, not a direct gain.
 - **Queries** (`src/cli/where.ts`): refs by entity, grouped by what happens, with the places that
   ultimately run a common event. `src/cli/index.ts` writes `symbols.json` and the unanalyzed report.
 

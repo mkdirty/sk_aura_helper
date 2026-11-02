@@ -5,6 +5,7 @@
 // script.ts. Anything not modelled is reported as "unanalyzed" so coverage stays honest.
 
 import type { Condition, Op, Operand, Value } from "../events/ops.ts";
+import type { Book } from "./books.ts";
 import { analyzeScript, expressionId } from "./script.ts";
 
 /**
@@ -57,6 +58,8 @@ export interface OpEffects {
 export interface EffectContext {
   /** Plugin parameters by plugin file name (for commands configured through them). */
   pluginParams: (plugin: string) => Record<string, string>;
+  /** Books that do something when finished (books.ts). */
+  books: Book[];
 }
 
 const valueId = (v: Value): Id => (v.kind === "const" ? v.value : { var: v.id });
@@ -141,11 +144,10 @@ const PRESENTATION = new Set([
 
 /** Known-but-unmodelled plugin commands, with what they do. */
 const UNANALYZED_NOTES: Record<string, string> = {
-  "books:readBook": "plugin books:readBook (reading progress; finished books can teach skills)",
   "newgame_plus_skills:initCarryOverSkills": "plugin newgame_plus_skills:initCarryOverSkills (learns NG+ carried skills)",
   "newgame_plus_skills:showOptionsForSkills": "plugin newgame_plus_skills:showOptionsForSkills (NG+ skill picker)",
   "newgame_plus:startNewGamePlus": "plugin newgame_plus:startNewGamePlus",
-  "TLB_SKACraftMenu:openScene": "plugin TLB_SKACraftMenu:openScene (crafting: consumes and gives items)",
+  "TLB_SKACraftMenu:openSceneDatabase": "plugin TLB_SKACraftMenu:openSceneDatabase (crafting from the formula database)",
   "TLB_SKABlessMenu:openScene": "plugin TLB_SKABlessMenu:openScene (blessing menu)",
 };
 
@@ -257,6 +259,38 @@ const PLUGIN_EFFECTS: Record<string, PluginHandler> = {
     if (a.commonEvent) out.effects.push({ entity: { kind: "commonEvent", id: Number(a.commonEvent) }, access: "call", how: "obstacle choice" });
     if (a.variableForReturnValue) out.effects.push({ entity: { kind: "variable", id: Number(a.variableForReturnValue) }, access: "write", how: "= obstacle choice" });
   },
+  // auramz/books.js: each listed actor advances their current book (assigned when gifted, CE882);
+  // finishing it applies the book's effects. Which book is runtime state, so every book applies.
+  // Book progress itself lives on the actor, outside the tracked state.
+  "books:readBook": (a, ctx, out) => {
+    const actors = (safeJson<string[]>(a.actorIds) ?? []).map(Number);
+    const reader = `actor ${actors.join("/")}`;
+    for (const book of ctx.books) out.effects.push(...book.effects(reader));
+  },
+  // auramzui/TLB_SKACraftMenu.js: opens the crafting scene. Crafting doesn't give the item: per
+  // craft it loses the ingredients and adds the recipe's quantity (raised to the efficiency
+  // variable's value, if larger) to its stock variable, which the merchant's shop then sells.
+  // The success switch turns on after any craft. showCondition is evaluated when listing.
+  "TLB_SKACraftMenu:openScene": (a, _c, out) => {
+    const recipes = (safeJson<unknown[]>(a.itemList) ?? []).map((r) => deepJson(r) as Record<string, any>);
+    for (const r of recipes) {
+      const target = Number(r.targetItemId);
+      const stock = Number(r.stockVar);
+      const quantity = Number(r.quantity);
+      const efficiency = Number(r.efficiencyVar);
+      out.effects.push({ entity: { kind: "item", id: target }, access: "write", how: `crafted (into stock V${stock}, ${quantity} per craft)` });
+      for (const ing of (r.ingredients ?? []) as Array<Record<string, string>>) {
+        out.effects.push({ entity: { kind: "item", id: Number(ing.itemId) }, access: "read", how: "count" });
+        out.effects.push({ entity: { kind: "item", id: Number(ing.itemId) }, access: "write", how: `lose (crafting ingredient for item ${target}, ${ing.quantity} per craft)`, sign: -1 });
+      }
+      out.effects.push({ entity: { kind: "variable", id: stock }, access: "read", how: "value" });
+      out.effects.push({ entity: { kind: "variable", id: stock }, access: "write", how: `+= crafted item ${target}` });
+      if (efficiency > 0) out.effects.push({ entity: { kind: "variable", id: efficiency }, access: "read", how: "value (craft efficiency)" });
+      if (r.showCondition) scriptEffects(String(r.showCondition), out, true);
+    }
+    const sw = Number(a.successSwitch);
+    if (sw > 0) out.effects.push({ entity: { kind: "switch", id: sw }, access: "write", how: "= ON (after crafting)" });
+  },
 };
 
 function localEvent(a: Record<string, any>, out: OpEffects, asCaller: boolean) {
@@ -271,6 +305,17 @@ function bestiary(enemy: unknown, how: string, out: OpEffects) {
   const id = expressionId(String(enemy));
   if (typeof id === "number" || (id && typeof id === "object")) out.effects.push({ entity: { kind: "bestiary", enemyId: id }, access: "write", how });
   else out.unanalyzed.push("bestiary (dynamic enemy)");
+}
+
+/** Parses nested JSON strings recursively, like TLB.SKABase.parseParameters. */
+function deepJson(v: unknown): unknown {
+  if (typeof v === "string") {
+    const parsed = safeJson<unknown>(v);
+    return parsed !== undefined && typeof parsed === "object" && parsed !== null ? deepJson(parsed) : v;
+  }
+  if (Array.isArray(v)) return v.map(deepJson);
+  if (v && typeof v === "object") return Object.fromEntries(Object.entries(v).map(([k, x]) => [k, deepJson(x)]));
+  return v;
 }
 
 function safeJson<T>(s: unknown): T | undefined {

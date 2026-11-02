@@ -1,11 +1,12 @@
 // Effects that live in the database rather than in events: class skill learnings, item and
 // skill effects (learn a skill, run a common event, add/remove states), skill-granting traits,
-// and enemy drops. Effect/trait codes come from the engine's Game_Action.EFFECT_* and
+// enemy drops, and what finishing a book teaches (books.ts). Effect/trait codes come from the engine's Game_Action.EFFECT_* and
 // Game_BattlerBase.TRAIT_* constants.
 
 import fs from "node:fs";
 import path from "node:path";
 import type { GameData } from "../data/game-data.ts";
+import { gameBooks } from "./books.ts";
 import type { Effect } from "./effects.ts";
 import type { Ref } from "./xref.ts";
 
@@ -78,5 +79,8 @@ export function databaseRefs(data: GameData): Ref[] {
       if (kind) add("enemies", enemy.id, i, { entity: { kind, id: d.dataId }, access: "write", how: `drop 1/${d.denominator} (enemy ${enemy.id})`, amount: 1, sign: 1 });
     });
   }
+
+  // Finishing a book (Aura through CE607/CE608, companions through books:readBook).
+  for (const book of gameBooks(data)) book.effects().forEach((effect, i) => add("items", book.itemId, i, effect));
   return refs;
 }

@@ -42,6 +42,30 @@ describe("cross-reference index (facts checked against the printed events)", () 
   });
 });
 
+describe("books and crafting (from the plugins' handlers and item notes)", () => {
+  it("skill 505 The Art Of Fire: taught by finishing book item 456, by Aura or a companion", () => {
+    const hows = where("skill", 505).map((r) => `${label(r)} ${r.effect.how}`);
+    expect(hows).toContain("items[456]#0 learn (finishing book item 456)");
+    expect(hows).toContain("CE883#0 learn (actor 2/3/4/16 finishes book item 456)");
+  });
+
+  it("skill 282 Offensive Stance I: forgotten when book item 453 teaches rank II", () => {
+    expect(where("skill", 282).map((r) => r.effect.how)).toContain("forget (finishing book item 453)");
+  });
+
+  it("V11 willpower: raised by finishing book item 455", () => {
+    expect(where("variable", 11).map((r) => `${label(r)} ${r.effect.how}`)).toContain("items[455]#1 += 10 (finishing book item 455)");
+  });
+
+  it("Louise's crafting (Map181/E4): bombs into stock V506 from item 204, success switch S45", () => {
+    const at = (refs: Ref[]) => refs.filter((r) => label(r) === "Map181/E4/p0#42").map((r) => r.effect.how);
+    expect(at(where("item", 7))).toContain("crafted (into stock V506, 5 per craft)");
+    expect(at(where("item", 204))).toContain("lose (crafting ingredient for item 7, 1 per craft)");
+    expect(at(where("variable", 506))).toContain("+= crafted item 7");
+    expect(at(where("switch", 45))).toContain("= ON (after crafting)");
+  });
+});
+
 describe("script analysis", () => {
   it("finds constant references to engine APIs", () => {
     const { effects, parsed } = analyzeScript("$gameParty.gainItem($dataItems[$gameVariables.value(650)], 3); if ($gameSwitches.value(22)) $gameMap.event(5).start();");

@@ -186,8 +186,24 @@ The game already records what the player has seen, which a "see all content" rou
 - Sources beyond events: class skill learnings (`Classes.json`), item/skill effects (learn skill
   ×48, run common event ×425, add/remove state), skill-granting traits (actors, classes, states,
   an enemy), enemy drops, shops (incl. conditional goods).
-- **Unmodelled sources:** the crafting menu (`TLB_SKACraftMenu`), book reading (`books:readBook`;
-  finished books can teach skills), the blessing menu, NG+ skill carry-over.
+- **Books** (`auramz/books.js`): 40 items with `<book:true>`. Each needs `<readings:N>` sessions
+  (plus the actor's extra readings). Finishing one runs `completeSkillBook` (`<skillId>`, plus
+  `<forgetId>` for the previous rank, e.g. book 453 swaps Offensive Stance I → II) or
+  `completeStatBook` (`<statplus:["mat:2"]>`; `"wp"` adds to V11 willpower instead of a
+  parameter). Lewd books (`<lewdmin>`) have neither tag. `<idkcheck>` is a JS prerequisite (e.g.
+  The Art Of Fire is blocked while `getSkillRank(25) == 0`: skill 25 "-- Fire" is the rank family
+  header, so any rank of Fire unlocks it).
+  - **Aura** reads by using the item at home: CE607 statBooks / CE608 skillBooks, one reading per
+    day (ends with CE11 `endDay`).
+  - **Companions** (actors 2, 3, 4, 16) are gifted a book at Map007 "Gift Item" (CE882 sets
+    `currentBook` and *loses the item*), then progress nightly through CE883 → `books:readBook`.
+    The registered `books:assignBook` is never used.
+- **Crafting** (`TLB_SKACraftMenu:openScene`, 4 places: Map009/E1 alchemist, Map181/E4 Louise
+  (general shop), Map218/E6 (artifact workshop), Map226/E4 (elixir alchemist)) doesn't give the item. Each craft loses the ingredients and adds the
+  recipe quantity (or the efficiency variable, if larger) to a **stock variable**, which that
+  merchant's shop sells from. The success switch turns on after any craft.
+  `openSceneDatabase` and the formula database are unused.
+- **Unmodelled sources:** the blessing menu, NG+ skill carry-over.
 - Example, **Fire I (skill 26):** learned at Map007/E8 `charlotte`; **forgotten** at Map007/E11
   and Map209/E35 (probably the upgrade to Fire II); learned at level 1 by classes 3 "Mage",
   15 and 23 (fire slimes). A lewd variant exists (712 "Fire II (Lewd Knowledge 20)"). So
