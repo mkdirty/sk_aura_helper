@@ -10,6 +10,10 @@ player-facing resources: an interactive map, a walkable decision graph, and so o
 | `game/` | Submodule: private repo holding the game as shipped, minus vendored and non-game files (below). Read-only extraction input; has its own `.gitignore`/`.gitattributes`. |
 | `vendor.json` | Pinned, freely downloadable parts of the game (URL + SHA-256 + file mapping). |
 | `scripts/vendor.mjs` | Downloads, verifies, and installs those into `game/`. |
+| `src/harness/` | Headless game engine: runs the game's own code in Node (see below). |
+| `src/cli/` | Command-line entry points. |
+| `test/` | Vitest suite (`npm test`). |
+| `docs/ROADMAP.md` | Plan and findings about the game. |
 
 ## Setup
 
@@ -23,6 +27,34 @@ npm run game           # launch the game (Linux)
 
 Downloads are cached in `.cache/vendor/` (gitignored). Re-running setup only copies files that differ;
 pass `-- --force` to overwrite everything.
+
+Development: `npm install`, then `npm test` and `npm run typecheck`. The game directory defaults to
+`gameDir` in `vendor.json`; override it with `SKA_GAME_DIR`.
+
+## Headless harness
+
+`src/harness/` runs the shipped engine and plugins in a Node `vm` context. It's the ground truth that
+static analysis gets checked against. Boot goes through the game's own code: the script list in
+`js/main.js`, `PluginManager.setup`, and the real `Scene_Boot` lifecycle (database, mods, template
+events, notetag processing).
+
+- **Deterministic:** `Math.random` is seeded, timers never fire on their own, and the profile is
+  empty by default (no saves or config are read unless `saveDir` is given).
+- **Read-only:** file writes are swallowed and recorded, and there is no network.
+- **No graphics or audio:** images "load" instantly and empty, and animations and balloons end
+  as soon as they start.
+- **Window-free messages:** messages and choices are answered by `MessageDriver`, which follows
+  the choice plugin's visibility, enable and default rules. Scripted input (`InputQueue`) drives
+  choices; otherwise a policy picks one.
+- **Change tracking:** switch, variable, self-switch, item and gold changes are recorded by
+  `ChangeTracker`.
+- **Scene changes** (battle, menus, shops, …) aren't emulated: a run stops and reports which scene
+  was requested.
+
+```sh
+npm run harness -- ce 16 12 --transcript   # new game on the empty map, run CE16 then CE12, print changes
+npm run harness -- test 50                 # run the author's automated event tests on Map050
+```
 
 ## What the game repo does not commit
 

@@ -73,10 +73,22 @@ in `experiments/`.
 
 ### Headless engine works
 
-A Node `vm` context with ~25 lines of stubs loads pixi.js, all six `rmmz_*.js` files and all 142
-enabled plugins. `DataManager.createGameObjects()` works, and the real `Game_Interpreter` runs CE16
-`initGame` and CE12 `startDay` correctly. Next blockers seen: a sync XHR→fs shim, `$dataCharGene`
-(MPP plugin data), and plugin JSON loads.
+Built in `src/harness/` (see README). Boot takes about 0.25s and goes through the game's own
+code: `js/main.js` script list, `PluginManager.setup` (143 unique enabled plugins), and the real
+`Scene_Boot` lifecycle. What it took, which is useful to know about the engine:
+
+- Data loading is promise-based (the mod loader loads mods before the database, and applies mods
+  to each data file and map in a promise). The context gets its own microtask queue, drained
+  explicitly, so runs stay synchronous and deterministic.
+- About two dozen plugins hook `Scene_Boot` (TemplateEvent loads its template map there; artifact,
+  passive skills, NG+ skills etc. process data there), so running the real boot scene matters.
+- Plugins expect `SceneManager._scene` (e.g. autosave requests); an uncreated `Scene_Map` stands in.
+- Move routes, animations and balloons block interpreters (`505` wait, `212` wait), so common
+  events must run inside full map frames.
+- Adding actor 1 to the party before she has been constructed recurses forever (MPP's actor setup
+  refreshes the player, which reads the leader). The game always touches the actor first.
+- Code relies on NW.js's working directory being the game dir (`mods`, relative reads).
+- Audio decoding (`vorbisdecoder.js`) and Effekseer are skipped; they start workers/WASM.
 
 ### Days
 
@@ -245,10 +257,12 @@ Language: TypeScript, so the game's own JS loads directly.
 
 ### First milestone
 
-1. `npm run harness -- ce 16 12`: boot the VM, run `initGame` and `startDay`, print a named change
-   log. Mostly done in `experiments/run_ce.js`.
-2. `npm run harness -- test Map050`: stub `event_test` plugin runs the InteractionTest cases and
-   reports pass/fail.
+1. ✅ `npm run harness -- ce 16 12`: boot, run `initGame` and `startDay`, print a named change log
+   (snapshot-tested).
+2. ✅ `npm run harness -- test 50`: a stub `event_test` plugin runs the InteractionTest cases. All 7
+   pass. The chain then reaches Map020's battle test, which needs `Scene_Battle` (not emulated
+   yet). Tests start from new game + CE16 `initGame` + Aura in the party, an approximation of the
+   author's "game in progress" launch via CE5 `startTest` → Map019 hub.
 3. `npm run print -- ce 11`: pretty-print `endDay` with names.
 4. One query: writers of V31/V2/V3/V19 (direct and via call graph) as JSON, with a snapshot test.
 

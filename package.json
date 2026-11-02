@@ -11,6 +11,15 @@
     "setup": "node scripts/vendor.mjs install",
     "vendor:check": "node scripts/vendor.mjs check",
     "runtime:detect": "node scripts/vendor.mjs detect",
-    "game": "./game/Game"
+    "game": "./game/Game",
+    "harness": "tsx src/cli/harness.ts",
+    "typecheck": "tsc",
+    "test": "vitest run"
+  },
+  "devDependencies": {
+    "@types/node": "^22.20.5",
+    "tsx": "^4.23.15",
+    "typescript": "^5.9.3",
+    "vitest": "^3.2.7"
   }
 }
