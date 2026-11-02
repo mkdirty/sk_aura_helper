@@ -31,8 +31,7 @@ REPL over real saves. See ARCHITECTURE "Planned components".
 
 ## Status (2026-11-02)
 
-All work is on branch `harness`, pushed to `origin`. `main` is still the initial commit; merging
-is the user's call.
+All work is merged into `main` (fast-forward) and pushed to `origin`; no other branches.
 
 | Tool | State |
 | --- | --- |

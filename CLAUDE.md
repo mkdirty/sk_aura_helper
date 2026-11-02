@@ -30,7 +30,8 @@ Each file holds one kind of thing. Put new information where it belongs:
 - `npm test` and `npm run typecheck` must pass before committing. The decoder test fails on any
   new decoder gap by design: it flags new command shapes after a game update.
 - `game/` is read-only. Generated output goes to gitignored `out/`.
-- Work on branches. Commit and push only when asked.
+- Work on branches; merge into `main` with `--ff-only` when the user asks. Commit only when asked;
+  push after every commit (standing permission).
 - Prefer reading the game's own code over guessing: engine semantics are in
   `game/js/rmmz_objects.js`, and plugins in `game/js/plugins/` (enabled list: `js/plugins.js`).
 
