@@ -80,6 +80,11 @@ the event actually runs.
   book item (Aura's path: the item runs CE607/CE608), and on `books:readBook` (the companions'
   path; every book applies, since which one is assigned is runtime state). Parameter gains aren't
   modelled, like the engine's Change Parameter: there's no parameter entity.
+- **Blessing** (`blessing.ts`, `TLB_SKABlessMenu:openScene` handler): blessable item pairs
+  derived from note tags, with the bless skills that allow each. The skill in force is runtime
+  state, so every call site lists every pair, labelled "with skill 389/390". `test/blessing.test.ts`
+  checks the derived pairs against the plugin's own `itemValid` in the harness.
+- Note tags are parsed by `notes.ts`, matching `DataManager.extractMetadata`.
 - **Crafting** (`TLB_SKACraftMenu:openScene` handler): per recipe, the target item is "crafted
   (into stock V…)", ingredients are lost, the stock variable is written, and the success switch
   is set. The target is a write in the same sense as "shop sells": a source, not a direct gain.

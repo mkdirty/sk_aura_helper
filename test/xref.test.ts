@@ -57,6 +57,15 @@ describe("books and crafting (from the plugins' handlers and item notes)", () =>
     expect(where("variable", 11).map((r) => `${label(r)} ${r.effect.how}`)).toContain("items[455]#1 += 10 (finishing book item 455)");
   });
 
+  it("blessing: item 7 Bomb → 303 Blessed Bomb with either bless skill; drugs need Bless Item II (390)", () => {
+    const hows = (id: number) => where("item", id).filter((r) => label(r) === "CE272#0").map((r) => r.effect.how);
+    expect(hows(7)).toContain("lose (blessed into item 303, with skill 389/390)");
+    expect(hows(303)).toContain("gain (blessed from item 7, with skill 389/390)");
+    expect(hows(364)).toContain("gain (blessed from item 55, with skill 390)");
+    // Already-blessed items have no blessed version of their own.
+    expect(where("item", 303).some((r) => r.effect.how.startsWith("lose (blessed into"))).toBe(false);
+  });
+
   it("Louise's crafting (Map181/E4): bombs into stock V506 from item 204, success switch S45", () => {
     const at = (refs: Ref[]) => refs.filter((r) => label(r) === "Map181/E4/p0#42").map((r) => r.effect.how);
     expect(at(where("item", 7))).toContain("crafted (into stock V506, 5 per craft)");

@@ -5,6 +5,7 @@
 // script.ts. Anything not modelled is reported as "unanalyzed" so coverage stays honest.
 
 import type { Condition, Op, Operand, Value } from "../events/ops.ts";
+import type { Blessing } from "./blessing.ts";
 import type { Book } from "./books.ts";
 import { analyzeScript, expressionId } from "./script.ts";
 
@@ -60,6 +61,8 @@ export interface EffectContext {
   pluginParams: (plugin: string) => Record<string, string>;
   /** Books that do something when finished (books.ts). */
   books: Book[];
+  /** Items the bless menu can turn into their blessed versions (blessing.ts). */
+  blessings: Blessing[];
 }
 
 const valueId = (v: Value): Id => (v.kind === "const" ? v.value : { var: v.id });
@@ -148,7 +151,6 @@ const UNANALYZED_NOTES: Record<string, string> = {
   "newgame_plus_skills:showOptionsForSkills": "plugin newgame_plus_skills:showOptionsForSkills (NG+ skill picker)",
   "newgame_plus:startNewGamePlus": "plugin newgame_plus:startNewGamePlus",
   "TLB_SKACraftMenu:openSceneDatabase": "plugin TLB_SKACraftMenu:openSceneDatabase (crafting from the formula database)",
-  "TLB_SKABlessMenu:openScene": "plugin TLB_SKABlessMenu:openScene (blessing menu)",
 };
 
 type PluginHandler = (args: Record<string, any>, ctx: EffectContext, out: OpEffects) => void;
@@ -291,6 +293,23 @@ const PLUGIN_EFFECTS: Record<string, PluginHandler> = {
     const sw = Number(a.successSwitch);
     if (sw > 0) out.effects.push({ entity: { kind: "switch", id: sw }, access: "write", how: "= ON (after crafting)" });
   },
+};
+
+// auramzui/TLB_SKABlessMenu.js: opens the bless menu. Which items it offers depends on the bless
+// skill in $gameTemp (runtime state), so every blessable item is listed with the skills that allow
+// it. MP (mode 1) is the leader's, which the index doesn't track; gold (mode 2) is.
+PLUGIN_EFFECTS["TLB_SKABlessMenu:openScene"] = (a, ctx, out) => {
+  for (const b of ctx.blessings) {
+    const by = `with skill ${b.skills.join("/")}`;
+    out.effects.push({ entity: { kind: "item", id: b.from }, access: "read", how: "count" });
+    out.effects.push({ entity: { kind: "item", id: b.from }, access: "write", how: `lose (blessed into item ${b.to}, ${by})`, sign: -1 });
+    out.effects.push({ entity: { kind: "item", id: b.to }, access: "read", how: "count" });
+    out.effects.push({ entity: { kind: "item", id: b.to }, access: "write", how: `gain (blessed from item ${b.from}, ${by})`, sign: 1 });
+  }
+  if (Number(a.mode) === 2) {
+    out.effects.push({ entity: { kind: "gold" }, access: "read", how: "value" });
+    out.effects.push({ entity: { kind: "gold" }, access: "write", how: "lose (blessing, 4 × item price each)", sign: -1 });
+  }
 };
 
 function localEvent(a: Record<string, any>, out: OpEffects, asCaller: boolean) {

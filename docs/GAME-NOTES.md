@@ -203,7 +203,15 @@ The game already records what the player has seen, which a "see all content" rou
   recipe quantity (or the efficiency variable, if larger) to a **stock variable**, which that
   merchant's shop sells from. The success switch turns on after any craft.
   `openSceneDatabase` and the formula database are unused.
-- **Unmodelled sources:** the blessing menu, NG+ skill carry-over.
+- **Blessing** (`TLB_SKABlessMenu:openScene`) swaps items for their `<blessed_version:N>`, one
+  for one. Eligibility is the item-type tags (`<bomb:true>`, `<drug:true>`…) listed in the bless
+  skill's `<canbless>`: skill 389 Bless Item I covers recovery and bombs (20 items), 390 Bless
+  Item II adds drugs and coatings (42). Cost per item: MP `price × 0.25 × MCR` (mode 1, Aura
+  casting the skill → CE272) or gold `price × 4` (mode 2, the White Priestess: Map008/E1 casts
+  Bless Item I, Map225/E60 Bless Item II, chosen by `$gameTemp.setLastUsedSkillId` just
+  before). Gold blessing is blocked while the leader has Eyes of Greed at willpower ≤ 0
+  (`ska_curses.js` `canSpendGold`).
+- **Unmodelled sources:** NG+ skill carry-over.
 - Example, **Fire I (skill 26):** learned at Map007/E8 `charlotte`; **forgotten** at Map007/E11
   and Map209/E35 (probably the upgrade to Fire II); learned at level 1 by classes 3 "Mage",
   15 and 23 (fire slimes). A lewd variant exists (712 "Fire II (Lewd Knowledge 20)"). So

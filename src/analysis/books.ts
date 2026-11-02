@@ -9,13 +9,7 @@
 
 import type { GameData } from "../data/game-data.ts";
 import type { Effect } from "./effects.ts";
-
-/** Note tags as the engine parses them (DataManager.extractMetadata). */
-export function noteMeta(note: string): Record<string, string | true> {
-  const meta: Record<string, string | true> = {};
-  for (const m of note.matchAll(/<([^<>:]+)(:?)([^>]*)>/g)) meta[m[1]] = m[2] === ":" ? m[3] : true;
-  return meta;
-}
+import { noteMeta } from "./notes.ts";
 
 export interface Book {
   itemId: number;
