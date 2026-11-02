@@ -78,7 +78,7 @@ function checkGuards(guards: Guard[], env: Env): Guard[] | undefined {
     const x = env.get(g.var);
     if (typeof x === "number") {
       if (!holds(g, x)) return undefined;
-    } else if (x) open.push({ ...g, var: x.var });
+    } else if (x && "var" in x) open.push({ ...g, var: x.var });
     else open.push(g);
   }
   return open;
@@ -107,11 +107,15 @@ function resolve(e: Effect, env: Env, ctx: Context): Effect {
       return known === undefined ? v : known;
     }
     if (v === "current" && ctx.mapId !== undefined) return ctx.mapId;
-    if (v === "self" && ctx.eventId !== undefined) return ctx.eventId;
+    if (v === "self" && ctx.eventId !== undefined) {
+      selfRelative = true;
+      return ctx.eventId;
+    }
     return v;
   };
+  let selfRelative = false;
   const entity = Object.fromEntries(Object.entries(e.entity).map(([k, v]) => [k, k === "kind" ? v : sub(v)])) as Entity;
-  return { ...e, entity, ...(e.amount !== undefined ? { amount: sub(e.amount) as Id } : {}) };
+  return { ...e, entity, ...(e.amount !== undefined ? { amount: sub(e.amount) as Id } : {}), ...(selfRelative ? { selfRelative: true as const } : {}) };
 }
 
 export interface XrefOptions {
@@ -140,9 +144,32 @@ export class XrefIndex {
       const ctx: Context = list.source.kind === "map" ? { mapId: list.source.mapId, eventId: list.source.eventId } : {};
       x.walk(ops, list.source, ctx, new Map(), [], false, o.effects);
     }
+    x.autonomousRoutes(o);
     x.instantiateCalls();
+    x.instantiateLocalCalls();
     x.refs.push(...databaseRefs(o.data));
     return x;
+  }
+
+  /**
+   * Event pages with a custom autonomous move route run its steps while the page is active,
+   * outside any command list. Recorded at the page with index -1.
+   */
+  private autonomousRoutes(o: XrefOptions) {
+    for (const mapId of o.data.mapIds()) {
+      if (mapId === o.data.templateMapId()) continue;
+      for (const event of o.data.map(mapId).events) {
+        if (!event) continue;
+        o.data.effectivePages(event).forEach((page, p) => {
+          if (page.moveType !== 3 || !page.moveRoute?.list?.length) return;
+          const steps = page.moveRoute.list
+            .filter((s: { code: number }) => s.code !== 0)
+            .map((s: { code: number; parameters: unknown[] }) => ({ code: s.code, name: o.decode.routeNames.get(s.code) ?? `step${s.code}`, params: s.parameters ?? [] }));
+          const op: Op = { code: 205, index: -1, kind: "moveRoute", character: { kind: "this" }, repeat: !!page.moveRoute.repeat, skippable: !!page.moveRoute.skippable, wait: false, steps };
+          this.walk([op], { kind: "map", mapId, eventId: event.id, page: p }, { mapId, eventId: event.id }, new Map(), [], false, o.effects);
+        });
+      }
+    }
   }
 
   private note(reason: string, site: Site) {
@@ -174,7 +201,7 @@ export class XrefIndex {
       // Update what's known about variables. Writing V invalidates V and any copies of V.
       const forget = (v: number) => {
         env.delete(v);
-        for (const [k, x] of env) if (typeof x === "object" && x.var === v) env.delete(k);
+        for (const [k, x] of env) if (typeof x === "object" && "var" in x && x.var === v) env.delete(k);
       };
       for (const e of effects) {
         if (e.access === "write" && e.entity.kind === "variable") {
@@ -275,6 +302,38 @@ export class XrefIndex {
         else if (call.source.kind !== "common") this.note(`argument not constant at call (${effect.entity.kind} via CE${call.callee})`, site);
       }
     }
+  }
+
+  /**
+   * `callLocalEventInline` runs another event's page as the calling event, so that page's
+   * "this event" effects land on the caller. (One level: an inline call inside the called page
+   * is not followed further.)
+   */
+  private instantiateLocalCalls() {
+    const selfRefs = new Map<string, Ref[]>();
+    for (const r of this.refs) {
+      const s = r.site.source;
+      if (s.kind !== "map" || !r.effect.selfRelative) continue;
+      const key = `${s.mapId}/${(r.effect.entity as { eventId?: unknown }).eventId}`;
+      if (!selfRefs.has(key)) selfRefs.set(key, []);
+      selfRefs.get(key)!.push(r);
+    }
+    const added: Ref[] = [];
+    for (const r of this.refs) {
+      const s = r.site.source;
+      const e = r.effect.entity;
+      if (s.kind !== "map" || r.effect.how !== "local event (as caller)" || e.kind !== "mapEvent" || typeof e.eventId !== "number") continue;
+      for (const callee of selfRefs.get(`${s.mapId}/${e.eventId}`) ?? []) {
+        const cs = callee.site.source as Extract<ListSource, { kind: "map" }>;
+        // Only the called page (or every page, if the current page is called).
+        if (cs.eventId !== e.eventId || cs.original || (e.page !== undefined && cs.page !== e.page)) continue;
+        added.push({
+          effect: { ...callee.effect, entity: { ...callee.effect.entity, eventId: s.eventId } as Entity, how: `${callee.effect.how} (via E${e.eventId} as caller)` },
+          site: { ...r.site, via: callee.site.via },
+        });
+      }
+    }
+    this.refs.push(...added);
   }
 
   /** Refs whose entity matches `kind` and (if given) `id`, live ones first. */

@@ -19,6 +19,12 @@ import { GameData } from "../data/game-data.ts";
 import { sourceLabel } from "../events/lists.ts";
 import { Names } from "../events/names.ts";
 
+// Exit quietly when piped into something that closes early (e.g. `| head`).
+process.stdout.on("error", (e: NodeJS.ErrnoException) => {
+  if (e.code === "EPIPE") process.exit(0);
+  throw e;
+});
+
 const { positionals, values } = parseArgs({
   allowPositionals: true,
   options: {
@@ -52,7 +58,8 @@ function describeSite(site: Site): string {
   let where: string;
   if (s.kind === "map") {
     const event = data.map(s.mapId).events[s.eventId];
-    where = `${names.map(s.mapId)} / E${s.eventId}${event ? ` ${JSON.stringify(event.name)}` : ""} / page ${s.page} #${site.index}`;
+    const at = site.index < 0 ? "autonomous route" : `#${site.index}`;
+    where = `${names.map(s.mapId)} / E${s.eventId}${event ? ` ${JSON.stringify(event.name)}` : ""} / page ${s.page} ${at}`;
   } else if (s.kind === "common") where = `${names.commonEvent(s.id)} #${site.index}`;
   else if (s.kind === "troop") where = `${names.troop(s.troopId)} / page ${s.page} #${site.index}`;
   else where = `database: ${s.table} ${s.id}${dbName(s.table, s.id)}`;
@@ -175,7 +182,7 @@ console.log(`${title!}: ${refs.length} reference${refs.length === 1 ? "" : "s"}`
 for (const [key, list] of [...groups].sort((a, b) => b[1].length - a[1].length)) {
   console.log(`\n  ${key} (${list.length})`);
   for (const r of list) {
-    const amount = r.effect.amount === undefined ? "" : typeof r.effect.amount === "number" ? `${r.effect.sign === -1 ? "-" : "+"}${r.effect.amount}  ` : `${r.effect.sign === -1 ? "-" : "+"}V${r.effect.amount.var}  `;
+    const amount = r.effect.amount === undefined ? "" : typeof r.effect.amount === "number" ? `${r.effect.sign === -1 ? "-" : "+"}${r.effect.amount}  ` : `${r.effect.sign === -1 ? "-" : "+"}${"var" in r.effect.amount ? `V${r.effect.amount.var}` : "?"}  `;
     console.log(`    ${amount}${describeSite(r.site)}`);
     if (r.site.source.kind === "common") {
       const entries = entryPoints(r.site.source.id);

@@ -51,8 +51,26 @@ describe("script analysis", () => {
     expect(effects).toContainEqual({ entity: { kind: "mapEvent", mapId: "current", eventId: 5 }, access: "call", how: "start" });
   });
 
-  it("counts references it can't pin down instead of guessing", () => {
-    expect(analyzeScript("$gameSwitches.setValue(x, true)")).toMatchObject({ effects: [], dynamic: 1 });
+  it("expands loops over constant arrays (Map022/E21's control-crystal setup)", () => {
+    const code = "const keys = [[141, 15, 'A'], [163, 1, 'A']]; const ids = [18, 233];\nfor (const id of ids) $gameSwitches.setValue(id, true);\nfor (const k of keys) $gameSelfSwitches.setValue(k, true);\nfor (const id of ids) $gameSwitches.setValue(id, false);";
+    const writes = analyzeScript(code).effects.filter((e) => e.access === "write").map((e) => JSON.stringify(e.entity));
+    expect(new Set(writes)).toEqual(
+      new Set([
+        '{"kind":"switch","id":18}',
+        '{"kind":"switch","id":233}',
+        '{"kind":"selfSwitch","mapId":141,"eventId":15,"letter":"A"}',
+        '{"kind":"selfSwitch","mapId":163,"eventId":1,"letter":"A"}',
+      ]),
+    );
+    // A name reassigned to something unknown is not trusted: the write is kept, with an unknown id.
+    expect(analyzeScript("let s = 5; s = foo(); $gameSwitches.setValue(s, true)")).toMatchObject({
+      effects: [{ entity: { kind: "switch", id: { unknown: "script" } }, access: "write" }],
+      dynamic: 1,
+    });
+  });
+
+  it("records references it can't pin down with an unknown id instead of guessing", () => {
+    expect(analyzeScript("$gameSwitches.setValue(x, true)")).toMatchObject({ effects: [{ entity: { kind: "switch", id: { unknown: "script" } } }], dynamic: 1 });
     expect(analyzeScript("this is not js(")).toMatchObject({ parsed: false });
   });
 

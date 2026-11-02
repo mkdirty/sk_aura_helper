@@ -76,6 +76,8 @@ export class Harness {
   readonly sceneRequests: string[] = [];
   /** The game's console output. */
   readonly logs: Array<{ level: string; text: string }> = [];
+  /** Maps the player has been transferred to, in order (map 0 included). */
+  readonly visitedMaps: number[] = [];
   /** Frames at which the game requested an autosave (not performed). */
   readonly autosaves: number[] = [];
   /** Image URLs the game asked for (bitmaps load instantly, empty). */
@@ -316,6 +318,7 @@ export class Harness {
       $gamePlayer.requestMapReload();
     }
     $gamePlayer.performTransfer();
+    this.visitedMaps.push(mapId);
   }
 
   /** One frame of Scene_Map.updateMain, then message handling and transfers. */
@@ -361,6 +364,26 @@ export class Harness {
     // Done when the interpreter leaves this list (another event may start in the same frame).
     const list = interpreter._list;
     return this.runUntil(() => interpreter._list !== list, maxFrames, () => this.frame());
+  }
+
+  /**
+   * Moves to `mapId` and runs one page of one of its events on the map interpreter, as if the
+   * event had started (page conditions and trigger are not checked). The player stands just
+   * below the event.
+   */
+  runEventPage(mapId: number, eventId: number, page: number, maxFrames = 100_000): RunResult {
+    this.transfer(mapId, 0, 0);
+    const { $gameMap, $gamePlayer } = this.g;
+    const event = $gameMap.event(eventId);
+    if (!event) throw new Error(`no event ${eventId} on map ${mapId}`);
+    const list = event.event().pages[page]?.list;
+    if (!list) throw new Error(`no page ${page} on map ${mapId} event ${eventId}`);
+    $gamePlayer.locate(event.x, event.y + 1);
+    const interpreter = $gameMap._interpreter;
+    if (interpreter.isRunning()) throw new Error("the map interpreter is busy");
+    interpreter.setup(list, eventId);
+    const running = interpreter._list;
+    return this.runUntil(() => interpreter._list !== running, maxFrames, () => this.frame());
   }
 
   /** Runs full map frames until no event has been running for `idleFrames` frames. */

@@ -18,6 +18,12 @@ import type { TextMode } from "../events/render.ts";
 import { Harness } from "../harness/harness.ts";
 import { ROOT } from "../paths.ts";
 
+// Exit quietly when piped into something that closes early (e.g. `| head`).
+process.stdout.on("error", (e: NodeJS.ErrnoException) => {
+  if (e.code === "EPIPE") process.exit(0);
+  throw e;
+});
+
 const { positionals, values } = parseArgs({
   allowPositionals: true,
   options: {

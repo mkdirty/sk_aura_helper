@@ -17,7 +17,8 @@
     "test": "vitest run",
     "print": "tsx src/cli/print.ts",
     "where": "tsx src/cli/where.ts",
-    "index": "tsx src/cli/index.ts"
+    "index": "tsx src/cli/index.ts",
+    "crosscheck": "tsx src/cli/crosscheck.ts"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",

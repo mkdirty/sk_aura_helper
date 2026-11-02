@@ -48,14 +48,20 @@ export function renderMap(mapId: number, o: DocumentOptions): string {
     if (!event) continue;
     out.push("", `=== E${event.id} ${JSON.stringify(event.name)} at (${event.x}, ${event.y}) ===`);
     if (event.note) out.push(`note: ${event.note.replace(/\n/g, " ⏎ ")}`);
-    event.pages.forEach((page, index) => {
+    const template = o.data.templateFor(event);
+    if (template && "event" in template) out.push(`template: Map${String(template.mapId).padStart(3, "0")}/E${template.event.id} ${JSON.stringify(template.event.name)} (its pages below; the event's own pages run only if the template calls them)`);
+    if (template && "dynamic" in template) out.push(`template: ${template.dynamic} (chosen at runtime or not found; the event's own pages are shown)`);
+    const pages = o.data.effectivePages(event);
+    const sections: Array<[typeof pages, boolean]> = [[pages, false]];
+    if (pages !== event.pages) sections.push([event.pages, true]);
+    for (const [list, original] of sections) list.forEach((page, index) => {
       const conds = pageConditions(page.conditions, names);
       const img = page.image.characterName ? `${page.image.characterName}#${page.image.characterIndex}` : page.image.tileId ? `tile ${page.image.tileId}` : "none";
       out.push(
-        `--- page ${index}: ${TRIGGERS[page.trigger] ?? `trigger ${page.trigger}`}, ${PRIORITIES[page.priorityType] ?? ""}, image ${img}` +
+        `--- ${original ? "original " : ""}page ${index}: ${TRIGGERS[page.trigger] ?? `trigger ${page.trigger}`}, ${PRIORITIES[page.priorityType] ?? ""}, image ${img}` +
           `${conds.length ? `; when ${conds.join(" and ")}` : ""} ---`,
       );
-      out.push(...body({ kind: "map", mapId, eventId: event.id, page: index }, page.list, o, names, 1));
+      out.push(...body({ kind: "map", mapId, eventId: event.id, page: index, ...(original ? { original: true as const } : {}) }, page.list, o, names, 1));
     });
   }
   return out.join("\n") + "\n";

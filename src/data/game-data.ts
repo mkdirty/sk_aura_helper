@@ -151,6 +151,33 @@ export class GameData {
     return this.load<GameMap>(`Map${String(id).padStart(3, "0")}.json`);
   }
 
+  /** TemplateEvent's template map (plugin parameter TemplateMapId), or undefined if not in use. */
+  templateMapId(): number | undefined {
+    const id = Number(this.pluginParams("TemplateEvent").TemplateMapId);
+    return id > 0 ? id : undefined;
+  }
+
+  /**
+   * The template a map event uses (TemplateEvent `<TE:name>` / `<TE:id>`), if any. At runtime the
+   * event's data becomes the template's (pages, conditions, routes); only its image is kept.
+   * `\v[n]` (variable-chosen) templates can't be resolved statically: `dynamic` is set instead.
+   */
+  templateFor(event: MapEvent): { event: MapEvent; mapId: number } | { dynamic: string } | undefined {
+    const tag = /<TE:([^>]*)>/.exec(event.note ?? "")?.[1];
+    const mapId = this.templateMapId();
+    if (tag === undefined || mapId === undefined) return undefined;
+    if (/\\v\[/i.test(tag)) return { dynamic: tag };
+    const templates = this.map(mapId).events;
+    const found = templates.find((t) => t?.name === tag) ?? (/^\d+$/.test(tag) ? templates[Number(tag)] : undefined);
+    return found ? { event: found, mapId } : { dynamic: tag };
+  }
+
+  /** The pages a map event actually runs: the template's, if it has one. */
+  effectivePages(event: MapEvent): MapEventPage[] {
+    const t = this.templateFor(event);
+    return t && "event" in t ? t.event.pages : event.pages;
+  }
+
   mapName(id: number): string {
     return this.mapInfos[id]?.name ?? "";
   }

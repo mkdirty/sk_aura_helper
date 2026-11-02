@@ -7,8 +7,14 @@
 import type { Condition, Op, Operand, Value } from "../events/ops.ts";
 import { analyzeScript, expressionId } from "./script.ts";
 
-/** A constant id, or "the value of variable N" (resolved at call sites when possible). */
-export type Id = number | { var: number };
+/**
+ * A constant id; "the value of variable N" (resolved at call sites when possible); or an id
+ * computed in a way the analysis can't follow (`unknown` says where it came from).
+ */
+export type Id = number | { var: number } | { unknown: string };
+
+/** Whether an id is computed in a way the analysis can't follow. */
+export const isUnknownId = (x: unknown): x is { unknown: string } => typeof x === "object" && x !== null && "unknown" in x;
 
 export type Entity =
   | { kind: "switch"; id: Id }
@@ -37,6 +43,8 @@ export interface Effect {
   /** For gains/losses: the amount and its sign. */
   amount?: Id;
   sign?: 1 | -1;
+  /** Set when "this event" was filled in: the effect follows whichever event runs the code. */
+  selfRelative?: true;
 }
 
 /** What one op does, plus anything about it that couldn't be analyzed. */
@@ -145,12 +153,19 @@ type PluginHandler = (args: Record<string, any>, ctx: EffectContext, out: OpEffe
 
 const bool = (v: unknown) => String(v) === "true";
 
-/** Adds script effects (or an unanalyzed note) for a JS snippet. */
-function scriptEffects(code: string, out: OpEffects, readOnly = false) {
+/**
+ * Adds script effects (or an unanalyzed note) for a JS snippet. `self`: what `this` means for
+ * "this event" references (a move route's `this` is the character being moved).
+ */
+function scriptEffects(code: string, out: OpEffects, readOnly = false, self?: Id | "self") {
   const a = analyzeScript(code);
   if (!a.parsed) out.unanalyzed.push("script (parse error)");
   if (a.dynamic) out.unanalyzed.push("script (dynamic ref)");
-  for (const e of a.effects) out.effects.push(readOnly && e.access === "write" ? { ...e, access: "read" } : e);
+  for (const raw of a.effects) {
+    let e = readOnly && raw.access === "write" ? { ...raw, access: "read" as const } : raw;
+    if (self !== undefined && e.entity.kind === "selfSwitch" && e.entity.eventId === "self") e = { ...e, entity: { ...e.entity, eventId: self } };
+    out.effects.push(e);
+  }
 }
 
 function selfSwitchWrite(mapId: Id | "current" | "self" | undefined, eventId: Id | "self" | "current" | undefined, letter: string, value: boolean, out: OpEffects) {
@@ -179,8 +194,10 @@ const PLUGIN_EFFECTS: Record<string, PluginHandler> = {
     out.effects.push({ entity: { kind: "selfSwitch", mapId: "current", eventId: Number(a.affectedEventID), letter: a.selfswitch }, access: "write", how: `= self ${a.selfswitch} of event ${a.observedEventID}` });
   },
   // auramz/event_utils.js: runs another event's page as a child interpreter.
-  "event_utils:callLocalEvent": (a, _c, out) => localEvent(a, out),
-  "event_utils:callLocalEventInline": (a, _c, out) => localEvent(a, out),
+  // callLocalEvent runs the page as the called event; callLocalEventInline runs it as the
+  // *calling* event (setupChild(list, inline ? eventId : parentEventId), inline=false).
+  "event_utils:callLocalEvent": (a, _c, out) => localEvent(a, out, false),
+  "event_utils:callLocalEventInline": (a, _c, out) => localEvent(a, out, true),
   // auramz/quests.js
   "quests:addQuest": (a, _c, out) => {
     out.effects.push({ entity: { kind: "quest", id: Number(a.questID) }, access: "write", how: "add" });
@@ -242,12 +259,12 @@ const PLUGIN_EFFECTS: Record<string, PluginHandler> = {
   },
 };
 
-function localEvent(a: Record<string, any>, out: OpEffects) {
+function localEvent(a: Record<string, any>, out: OpEffects, asCaller: boolean) {
   const eventId = expressionId(String(a.eventID));
   if (eventId === undefined || eventId === "current") return void out.unanalyzed.push("local event call (dynamic id)");
   const page = Number(a.pageID);
   // pageID -1: the event's current page.
-  out.effects.push({ entity: { kind: "mapEvent", mapId: "current", eventId: eventId === 0 ? "self" : eventId, ...(page >= 0 ? { page } : {}) }, access: "call", how: "local event" });
+  out.effects.push({ entity: { kind: "mapEvent", mapId: "current", eventId: eventId === 0 ? "self" : eventId, ...(page >= 0 ? { page } : {}) }, access: "call", how: asCaller ? "local event (as caller)" : "local event" });
 }
 
 function bestiary(enemy: unknown, how: string, out: OpEffects) {
@@ -363,7 +380,12 @@ export function opEffects(op: Op, ctx: EffectContext): OpEffects {
     case "moveRoute":
       for (const s of op.steps) {
         if (s.name === "switch_on" || s.name === "switch_off") push({ kind: "switch", id: Number(s.params[0]) }, "write", `= ${s.name === "switch_on" ? "ON" : "OFF"} (move route)`);
-        if (s.name === "script") scriptEffects(String(s.params[0] ?? ""), out);
+        if (s.name === "script") {
+          // `this` in a route script is the moved character: the player has no self switches.
+          const self = op.character.kind === "event" ? op.character.id : op.character.kind === "this" ? "self" : undefined;
+          if (op.character.kind === "player") scriptEffects(String(s.params[0] ?? ""), out);
+          else scriptEffects(String(s.params[0] ?? ""), out, false, self);
+        }
       }
       break;
     case "battle":

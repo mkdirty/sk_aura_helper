@@ -5,15 +5,29 @@
 //       in order and print the state changes it made.
 //   npm run harness -- test <mapId...> [--json] [--verbose]
 //       Run the author's automated event tests on each map (e.g. 50).
+//   npm run harness -- who <switch N | variable N | self M,E,L> (ce <id> | page <map> <event> <page>)
+//       From the cross-check's "game in progress", run the entry and show who writes the target
+//       (stack + running parallel events). Diagnoses unexplained cross-check changes.
+//   npm run harness -- handler <plugin:command...>
+//       Print the source of registered plugin command handlers (e.g. selfswitches_utils:setLocalSelfSwitch).
 
 import { parseArgs } from "node:util";
 import { runEventTests } from "../harness/event-test.ts";
 import { formatChange, formatEventTests, formatStop, formatTranscript } from "../harness/format.ts";
 import { Harness } from "../harness/harness.ts";
+import { startGameInProgress, traceWrites, type TracedWrite, type TraceTarget } from "../harness/trace.ts";
+
+// Exit quietly when piped into something that closes early (e.g. `| head`).
+process.stdout.on("error", (e: NodeJS.ErrnoException) => {
+  if (e.code === "EPIPE") process.exit(0);
+  throw e;
+});
 
 const USAGE = `usage:
   harness ce <id...> [--map N] [--seed N] [--transcript] [--json] [--verbose]
-  harness test <mapId...> [--seed N] [--json] [--verbose]`;
+  harness test <mapId...> [--seed N] [--json] [--verbose]
+  harness who <switch N | variable N | self M,E,L> (ce <id> | page <map> <event> <page>)
+  harness handler <plugin:command...>`;
 
 const { positionals, values } = parseArgs({
   allowPositionals: true,
@@ -29,14 +43,44 @@ const { positionals, values } = parseArgs({
 
 const [command, ...rest] = positionals;
 const ids = rest.map(Number);
-if (values.help || !command || !ids.length || ids.some((n) => !Number.isInteger(n))) {
+const numeric = command === "ce" || command === "test";
+if (values.help || !command || !rest.length || (numeric && ids.some((n) => !Number.isInteger(n)))) {
   console.error(USAGE);
   process.exit(values.help ? 0 : 2);
 }
 
 const boot = () => Harness.boot({ seed: Number(values.seed), echoConsole: values.verbose });
 
-if (command === "ce") {
+if (command === "who") {
+  const [kind, spec, entry, ...where] = rest;
+  const target: TraceTarget | undefined =
+    kind === "switch" || kind === "variable"
+      ? { kind, id: Number(spec) }
+      : kind === "self"
+        ? { kind: "selfSwitch", key: [Number(spec.split(",")[0]), Number(spec.split(",")[1]), String(spec.split(",")[2])] }
+        : undefined;
+  if (!target || (entry !== "ce" && entry !== "page")) {
+    console.error(USAGE);
+    process.exit(2);
+  }
+  const h = await boot();
+  startGameInProgress(h);
+  const writes: TracedWrite[] = [];
+  traceWrites(h, target, writes);
+  const [a, b, c] = where.map(Number);
+  const run = entry === "ce" ? h.runCommonEvent(a, 3000) : h.runEventPage(a, b, c, 3000);
+  console.log(`run: ${formatStop(run.stop)} after ${run.frames} frames; ${writes.length} write(s)`);
+  for (const w of writes) {
+    console.log(`\n= ${JSON.stringify(w.value)} on map ${w.mapId}${w.parallel.length ? `; parallel events running: ${w.parallel.join(", ")}` : ""}`);
+    for (const line of w.stack) console.log(`    ${line}`);
+  }
+} else if (command === "handler") {
+  const h = await boot();
+  for (const key of rest) {
+    const fn = h.g.PluginManager._commands[key];
+    console.log(`== ${key}\n${fn ? String(fn) : "(not registered)"}\n`);
+  }
+} else if (command === "ce") {
   const h = await boot();
   h.newGame({ mapId: Number(values.map) });
   const runs = [];

@@ -35,7 +35,9 @@ export class ChangeTracker {
       const before = !!this.value(key);
       orig();
       const after = !!this.value(key);
-      if (before !== after) record({ frame: frame(), kind: "selfSwitch", key: [...key], before, after });
+      // Keys are stringified by the engine, so [198, "21", "B"] (from plugins passing string
+      // args) is the same switch as [198, 21, "B"]: normalize.
+      if (before !== after) record({ frame: frame(), kind: "selfSwitch", key: [Number(key[0]), Number(key[1]), String(key[2])], before, after });
     });
     wrap(g.Game_Party.prototype, "gainItem", function (this: any, orig, item: any) {
       if (!item) return orig();

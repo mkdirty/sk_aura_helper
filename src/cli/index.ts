@@ -14,6 +14,12 @@ import { GameData } from "../data/game-data.ts";
 import { sourceLabel } from "../events/lists.ts";
 import { ROOT } from "../paths.ts";
 
+// Exit quietly when piped into something that closes early (e.g. `| head`).
+process.stdout.on("error", (e: NodeJS.ErrnoException) => {
+  if (e.code === "EPIPE") process.exit(0);
+  throw e;
+});
+
 const { values } = parseArgs({ options: { out: { type: "string", default: path.join(ROOT, "out/index") } } });
 const out = path.resolve(values.out);
 fs.mkdirSync(out, { recursive: true });
