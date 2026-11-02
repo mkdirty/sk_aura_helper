@@ -131,6 +131,22 @@ export class GameData {
       .sort((a, b) => a - b);
   }
 
+  /** js/plugins.js: the plugin list with parameters, in load order. */
+  plugins(): Array<{ name: string; status: boolean; parameters: Record<string, string> }> {
+    let value = this.cache.get("plugins.js") as ReturnType<GameData["plugins"]> | undefined;
+    if (!value) {
+      const src = fs.readFileSync(path.join(this.dir, "js/plugins.js"), "utf8");
+      value = JSON.parse(src.slice(src.indexOf("["), src.lastIndexOf("]") + 1));
+      this.cache.set("plugins.js", value);
+    }
+    return value!;
+  }
+
+  /** Parameters of an enabled plugin, by file name (e.g. "adult_content_option"). */
+  pluginParams(name: string): Record<string, string> {
+    return this.plugins().find((p) => p.status && p.name.split("/").pop() === name)?.parameters ?? {};
+  }
+
   map(id: number): GameMap {
     return this.load<GameMap>(`Map${String(id).padStart(3, "0")}.json`);
   }

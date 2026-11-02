@@ -302,8 +302,8 @@ Language: TypeScript, so the game's own JS loads directly.
 1. Kernel: loaders and headless harness
 2. Whole-project decoder + pretty-printer + coverage report (one pass), then CFG builder
 3. Call graph and taint report
-4. Cross-reference index with argument propagation ("where is item X"), plus the generated
-   symbols database
+4. ✅ Cross-reference index with argument propagation ("where is item X"), plus the generated
+   symbols database (done before the CFG: flow-insensitive questions don't need it; see Progress)
 5. Day model, fuzzed against the harness
 6. Requirement slicing, then routing bounds
 7. Offline map render and public site (can start any time after step 1)
@@ -329,6 +329,27 @@ Language: TypeScript, so the game's own JS loads directly.
    - Labels/jumps cross block boundaries (Map265/E8 jumps into a choice branch), which confirms
      the CFG is needed.
 4. One query: writers of V31/V2/V3/V19 (direct and via call graph) as JSON, with a snapshot test.
+
+## Progress: cross-reference index (2026-11-02)
+
+`npm run where` / `npm run index`: about 109k references, built in ~2.5s.
+
+- **Reads/writes per op** for engine commands, 50+ plugin commands (handlers written from their
+  registered implementations; ~60 more checked to have no persistent effect), scripts (acorn;
+  all parse), and the database (class learnings, item/skill effects, traits, drops).
+- **Argument passing** is generic: symbolic ids ("value of V650"), common-event summaries,
+  call-site constants, copies between variables (CE204 `V650 = V28`), and path conditions that
+  drop impossible branches (Obtain_Item's `quantity <= 0` path).
+- **Still unseen**, ranked in `where unanalyzed`: 421 calls whose arguments aren't constants
+  (mostly runtime-chosen maps for the recollection room, and selected items), 95 scripts with
+  computed ids, and 11 plugin-command uses with real but unmodelled effects: crafting and blessing
+  menus, book reading (teaches skills), NG+ skill carry-over.
+- Facts surfaced:
+  - **Game bug:** Troop245 calls `ska_compendium::revealTrait`, which no plugin registers, so
+    the "sluggish" trait of enemy 112 is never revealed there. Every other use is `compendium`.
+  - Using the Engagement Ring item (CE147) gives Ether.
+  - With scripts included, still no unnamed switch or variable is used. The one used section
+    header is V25 `-- System`, the author's test-chain counter.
 
 ## Open (deferred) questions
 

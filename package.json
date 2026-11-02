@@ -15,12 +15,18 @@
     "harness": "tsx src/cli/harness.ts",
     "typecheck": "tsc",
     "test": "vitest run",
-    "print": "tsx src/cli/print.ts"
+    "print": "tsx src/cli/print.ts",
+    "where": "tsx src/cli/where.ts",
+    "index": "tsx src/cli/index.ts"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",
     "tsx": "^4.23.15",
     "typescript": "^5.9.3",
     "vitest": "^3.2.7"
+  },
+  "dependencies": {
+    "acorn": "^8.19.0",
+    "acorn-walk": "^8.3.5"
   }
 }

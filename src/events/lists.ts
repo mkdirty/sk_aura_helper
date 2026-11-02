@@ -5,7 +5,9 @@ import type { GameData, RawCommand } from "../data/game-data.ts";
 export type ListSource =
   | { kind: "map"; mapId: number; eventId: number; page: number }
   | { kind: "common"; id: number }
-  | { kind: "troop"; troopId: number; page: number };
+  | { kind: "troop"; troopId: number; page: number }
+  /** A database row (no command list), e.g. a class's skill learnings or an item's effects. */
+  | { kind: "database"; table: string; id: number };
 
 export interface CommandList {
   source: ListSource;
@@ -23,6 +25,8 @@ export function sourceLabel(s: ListSource): string {
       return `CE${s.id}`;
     case "troop":
       return `Troop${s.troopId}/p${s.page}`;
+    case "database":
+      return `${s.table}[${s.id}]`;
   }
 }
 

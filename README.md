@@ -12,6 +12,7 @@ player-facing resources: an interactive map, a walkable decision graph, and so o
 | `scripts/vendor.mjs` | Downloads, verifies, and installs those into `game/`. |
 | `src/data/` | Static access to the game's data files. |
 | `src/events/` | Event command decoder, pretty-printer and coverage report (see below). |
+| `src/analysis/` | Reads/writes per command, script analysis, cross-reference index (see below). |
 | `src/harness/` | Headless game engine: runs the game's own code in Node (see below). |
 | `src/cli/` | Command-line entry points. |
 | `test/` | Vitest suite (`npm test`). |
@@ -52,6 +53,30 @@ npm run print -- ce 11 --text first # dialogue: full (default), first line, or n
 
 The test suite fails if a full decode has any gaps, so a game update that introduces a new
 command shape gets flagged. CE11 and Map265/E8 are hand-checked reference outputs (snapshots).
+
+## Cross-reference index ("where is X used?")
+
+`src/analysis/` works out what each decoded command reads, writes and calls: engine commands, plugin
+commands (handlers written from each plugin's registered implementation), and scripts (parsed with
+acorn; constant references to engine APIs). Database sources count too: class skill lists, item and
+skill effects, skill-granting traits, enemy drops.
+
+Helper common events that take arguments in variables (e.g. `Obtain_Item`: V650 = item,
+V651 = amount) are handled generically. Their caller-dependent effects are filled in from values
+assigned just before each call, following copies between variables and dropping branches the values
+rule out. "This event" inside a common event resolves to the calling map event.
+
+```sh
+npm run where -- item 23           # also weapon/armor/skill/state/class/actor/troop/switch/variable/gold
+npm run where -- skill 26          # event learn/forget, class learnings, items that teach it
+npm run where -- selfswitch 11 11 A
+npm run where -- ce 785            # who runs a common event; also: map 7, event 7 8, quest 51
+npm run where -- unanalyzed        # what the index couldn't see, ranked
+npm run index                      # out/index/symbols.json (+ unanalyzed.txt)
+```
+
+References inside common events also list the places that ultimately run them
+(`← run from 90 places: Map011/E11 "ether", …`).
 
 ## Headless harness
 
