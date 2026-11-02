@@ -1,0 +1,28 @@
+# game/ is its own repository (submodule) with its own .gitignore/.gitattributes.
+
+# Downloaded vendor archives / extraction scratch
+/.cache/
+
+# Node
+node_modules/
+npm-debug.log*
+.npm/
+
+# Build output (future tools: map, graph, etc.)
+/dist/
+/build/
+/out/
+
+# Environment / local config
+.env
+.env.*
+
+# Editors / OS
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db

@@ -1,0 +1,43 @@
+{
+  "$comment": "Freely downloadable components of the shipped game. Each was verified byte-identical to the game's copy, is gitignored, and is restored by `npm run setup`. `files` maps archive paths to game paths; \"*\" installs the whole archive (with optional renames).",
+  "gameDir": "game",
+  "engine": "RPG Maker MZ",
+  "sources": [
+    {
+      "name": "nwjs",
+      "description": "NW.js runtime (normal flavor; Chromium 85.0.4183.121, Node 14.12.0). Detected from lib/libnw.so.",
+      "version": "0.48.4",
+      "platform": "linux-x64",
+      "url": "https://dl.nwjs.io/v0.48.4/nwjs-v0.48.4-linux-x64.tar.gz",
+      "sha256": "49dbede465b5dc9a7e6cda244083e82ee59272be3a378951389ac0717e578f97",
+      "stripComponents": 1,
+      "files": "*",
+      "rename": { "nw": "Game" }
+    },
+    {
+      "name": "effekseer",
+      "description": "Effekseer for WebGL",
+      "version": "1.70b",
+      "url": "https://github.com/effekseer/EffekseerForWebGL/releases/download/170b/EffekseerForWebGL170b.zip",
+      "sha256": "131e6a86842d95c133aef88dc396c3ba8def0d7435707ebe62e8ab59dc37aa4e",
+      "files": {
+        "effekseer.min.js": "js/libs/effekseer.min.js",
+        "effekseer.wasm": "js/libs/effekseer.wasm"
+      }
+    },
+    {
+      "name": "localforage",
+      "version": "1.7.3",
+      "url": "https://registry.npmjs.org/localforage/-/localforage-1.7.3.tgz",
+      "sha256": "0fb02dcc7084ee9216ce03aa8064a288a77bf7537bb532f71280a18ded097754",
+      "files": { "package/dist/localforage.min.js": "js/libs/localforage.min.js" }
+    },
+    {
+      "name": "pako",
+      "version": "1.0.11",
+      "url": "https://registry.npmjs.org/pako/-/pako-1.0.11.tgz",
+      "sha256": "0d4028dc0352a740c30cbfd772917f2744986d42bfa0b06ec7642bffe7ad3941",
+      "files": { "package/dist/pako.min.js": "js/libs/pako.min.js" }
+    }
+  ]
+}

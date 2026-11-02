@@ -1,0 +1,66 @@
+# ---------------------------------------------------------------------------
+# Default: our own source is normalized to LF. (game/ is a separate repo with
+# its own byte-exact .gitattributes.)
+# ---------------------------------------------------------------------------
+* text=auto eol=lf
+
+# Minified bundles: diffs are noise
+*.min.js -diff
+
+# ---------------------------------------------------------------------------
+# Binary assets (binary = -text -diff -merge)
+# ---------------------------------------------------------------------------
+# Images (generated map renders, docs, etc.)
+*.png    binary
+*.png_   binary
+*.rpgmvp binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.webp   binary
+*.bmp    binary
+*.ico    binary
+*.psd    binary
+
+# Audio / video
+*.ogg    binary
+*.ogg_   binary
+*.m4a    binary
+*.m4a_   binary
+*.rpgmvo binary
+*.rpgmvm binary
+*.mp3    binary
+*.wav    binary
+*.webm   binary
+*.mp4    binary
+
+# Effekseer effects / models, Spine binary skeletons
+*.efkefc   binary
+*.efkmodel binary
+*.efkmat   binary
+*.efk      binary
+*.skel     binary
+
+# Fonts
+*.ttf   binary
+*.TTF   binary
+*.otf   binary
+*.woff  binary
+*.woff2 binary
+
+# Native / compiled / archives
+*.wasm  binary
+*.node  binary
+*.so    binary
+*.dll   binary
+*.lib   binary
+*.exe   binary
+*.dylib binary
+*.pak   binary
+*.dat   binary
+*.bin   binary
+*.pyc   binary
+*.zip   binary
+*.gz    binary
+*.tgz   binary
+*.7z    binary

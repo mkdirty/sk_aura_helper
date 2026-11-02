@@ -1,0 +1,16 @@
+{
+  "name": "sk-aura-tools",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Deterministic data extraction and player navigation tools for Star Knightess Aura.",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "setup": "node scripts/vendor.mjs install",
+    "vendor:check": "node scripts/vendor.mjs check",
+    "runtime:detect": "node scripts/vendor.mjs detect",
+    "game": "./game/Game"
+  }
+}
