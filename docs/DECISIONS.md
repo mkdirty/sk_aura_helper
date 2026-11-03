@@ -241,3 +241,46 @@ answer prints the assumptions it relied on.
   (drops, random variables) are assumed to happen eventually and marked `random`.
 - **Cache:** JSON/NDJSON in `out/graph/`, keyed by a hash of the game data, enabled plugins and
   tool version. SQLite only if the public site (phase 9) needs it.
+
+### How the graph is built and answers are given (2026-11-02)
+
+Adopted from the plan's proposals ([plans/phase6-cfg.md](plans/phase6-cfg.md) 8.3), with the
+refinements noted.
+
+- **The CFG follows the interpreter, not the editor.** Nodes are raw command indices, built from
+  the decoded tree. A jump goes to the *first* label with that name; a missing label is a no-op;
+  Break Loop scans forward by 112/413 depth. The end of a branch body leaves the construct, also
+  after a jump into it, because `jumpTo` resets branch state. Why: the ~143 jumps that enter blocks
+  make lexical structure wrong, and the engine is ground truth. The jump claim is checked against
+  interpreter traces in the harness (M2) before anything builds on it.
+- **Requirements are necessary conditions; plans are relaxed.** A site's requirement must hold
+  whenever the site runs, and the harness checks that. `needs` answers come from a model that
+  ignores undoing (deletes), so they are labelled possible plans or lower bounds, with threats
+  listed. "Unreachable" is claimed only when no unknown writer or opaque condition is involved.
+  Why: soundness is checkable now; real ordering is phase 8's job.
+- **Conditions are translated, not evaluated.** JS in event scripts, choice conditions and note
+  tags is translated by AST pattern into typed atoms. Anything else stays an explicit `opaque` or
+  `untracked` atom, with what it reads; the untranslated share is counted in a coverage report.
+  Evaluation in the harness is the test oracle. Why: queries stay static and fast, and the
+  translator is tested rather than trusted (honest coverage).
+- **Context slots generalize call-site instantiation.** `lastItem`, `lastSkill`, `eventId`,
+  `mapId` and argument variables are bound at call and use sites. Extends "Helper arguments are
+  handled generically"; it also fixes the blessing over-approximation and the "this event" of a
+  call made after a transfer.
+- **Scratch variables are derived, not listed.** A variable whose every read is preceded by a
+  write in the same list or bound by the caller gets no global facts, and `symbols.json` flags it.
+  Extends "Scratch and argument slots aren't global symbols". Why: a hand list would go stale
+  after updates.
+- **Execution budgets come from page priority, and only when proven (refined).** A rule runs at
+  most once when its page provably disables itself: a higher page's conditions become exactly
+  true (typically a self switch), or its own become false. **Erase Event gives "once per map
+  visit", not "once"** (refinement: the event comes back when the map reloads). Anything not
+  proven is "many", which over-approximates. Why: counters, missability and "consumed" depend on
+  it, and a wrong "once" would hide real ways.
+- **Plugin control flow is reviewed like plugin effects.** Calls, choice-condition binding and
+  scene or player-action semantics of plugin commands live next to `PLUGIN_EFFECTS` and expire
+  with the same handler hashes ("Reviews are recorded and expire").
+- **Answers are derivation trees with typed references.** CLI text, JSON, the site and the
+  walkthrough share one schema (`Way`/`Need`/`Step`). Locations are `Map/E/p#idx` for now, each
+  with a structural path and a content hash of the command subtree until stable anchors exist,
+  so version diffs can say "the requirements of X changed".

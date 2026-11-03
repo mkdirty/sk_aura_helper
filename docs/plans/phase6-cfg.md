@@ -1,9 +1,10 @@
 # Phase 6 plan: control-flow graph and requirement tracing
 
-> **Status: proposal (2026-11-02).** Written by a planning subagent. The open questions (8.2) are
-> answered in DECISIONS "Query defaults for `needs`" (one answer differs: configuration is left
-> open and labelled, not assumed ON). The proposed decisions (8.3) are not yet agreed; agreed ones
-> move to DECISIONS.md. Line numbers cite the code as of commit `5df4220`.
+> **Status: agreed (2026-11-02).** Written by a planning subagent. The open questions (8.2) are
+> answered in DECISIONS "Query defaults for `needs`", and the proposals (8.3) are adopted in
+> DECISIONS "How the graph is built and answers are given". Where they differ from this plan
+> (configuration left open, not assumed ON; Erase Event means once per map visit), DECISIONS wins.
+> Line numbers cite the code as of commit `5df4220`.
 
 This plan is based on reading the docs, all of `src/` and `test/`, the engine (`game/js/rmmz_objects.js`) and the relevant plugins, plus read-only runs of `where`, `print` and small `node`/`tsx` scans over `game/data`. I changed no files. Example CLI outputs in section 4 are mock-ups: every fact in them was checked against the data, but the formatting is a proposal.
 
@@ -667,6 +668,8 @@ Total ~4,900 lines. That is about as much code again as the repo has today (~5.5
 8. Cache format now: JSON/NDJSON in `out/graph/` (proposed), with SQLite only for publishing (phase 9)?
 
 ### 8.3 Proposed DECISIONS entries (proposals, not yet agreed)
+
+**Adopted (2026-11-02):** see DECISIONS "How the graph is built and answers are given".
 
 - **CFG follows the interpreter, not the editor (proposal).** Nodes are raw command indices built from the decoded tree. A jump goes to the first label with that name; a missing label is a no-op. Break Loop scans forward by 112/413 depth. The end of a branch body leaves the construct, also after a jump, because `jumpTo` resets branch state. Checked against interpreter traces in the harness.
 - **Requirements are necessary conditions; plans are relaxed (proposal).** `Req(site)` must hold whenever the site runs, which the harness checks. `needs` answers come from a delete-relaxed model and are labelled as possible plans or lower bounds. "Unreachable" is only claimed when no unknown writer or opaque condition is involved.
