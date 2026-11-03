@@ -50,6 +50,10 @@ Each file holds one kind of thing. Put new information where it belongs:
   persistent effect. Unhandled ones are ranked in `npm run where -- unanalyzed`. Then record the
   review: `npm run plugins -- --accept plugin:command`. After a game update, `npm run plugins`
   lists handlers that changed since their review: re-read each before accepting it.
+- **CFG findings:** `npm run cfg` lists findings (missing/duplicate labels, unmodelled
+  interpreter tricks) with their review status. For each new or changed one, read the list
+  (`npm run cfg -- map …` / `ce …`), confirm the effect in the harness when unclear, record what it
+  means in GAME-NOTES "Bugs and quirks", then `npm run cfg -- --accept KEY --note "bug: …"`.
 - **Index soundness:** run `npm run crosscheck` (~5s) or `-- --pages` (~28 min). Diagnose the top
   unexplained group with `npm run harness -- who <target> page <map> <event> <page>`, fix, then
   `npm run crosscheck -- --rerun-unexplained` (seconds). Record what the fix taught in

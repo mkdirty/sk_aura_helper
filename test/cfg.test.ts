@@ -6,6 +6,7 @@ import { Names } from "../src/events/names.ts";
 import { cycles, dominators, postDominators, SINK } from "../src/graph/cfg-analysis.ts";
 import { renderCfgText } from "../src/graph/cfg-print.ts";
 import { buildCfg, cfgContext, ENTRY, EXIT, GAMEOVER, type Cfg, type CfgContext } from "../src/graph/cfg.ts";
+import { compareFindings, currentFindings, loadFindingReview } from "../src/graph/cfg-review.ts";
 
 let data: GameData;
 let ctx: CfgContext;
@@ -215,6 +216,16 @@ describe("whole project", () => {
     // Markers otherwise always read a state their own opener set (jumps into blocks included,
     // thanks to jumpTo's resets). A stale edge of another kind is worth a look.
     expect([...staleKinds].sort()).toEqual(["noBattle", "noChoice"]);
+  });
+});
+
+// Fails after a game update that adds a finding (missing/duplicate label, unmodelled interpreter
+// trick…) or changes a list with a reviewed one. Fix: `npm run cfg -- --review`, look at each,
+// record it in GAME-NOTES if it matters, then `npm run cfg -- --accept KEY… --note "…"`.
+describe("CFG findings are reviewed", () => {
+  it("every finding has a current review", () => {
+    const p = compareFindings(loadFindingReview(), currentFindings(data, ctx));
+    expect(p).toEqual({ unreviewed: [], changed: [], gone: [] });
   });
 });
 

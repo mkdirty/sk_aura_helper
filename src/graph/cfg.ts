@@ -75,7 +75,12 @@ export interface CfgIssue {
   key: string;
   index: number;
   detail: string;
+  /** "finding": possibly a mistake in the game or a gap in the model, to review; "note": a handled case. */
+  severity: "finding" | "note";
 }
+
+/** Issue keys that record handled cases rather than something to review. */
+const NOTES = new Set(["jump enters a block", "dynamic jump", "dynamic jump (label not resolved)", "unreachable commands"]);
 
 export interface Cfg {
   source: ListSource;
@@ -323,7 +328,7 @@ export function buildCfg(source: ListSource, rawList: RawCommand[], ctx: CfgCont
     const k = `${key}@${index}:${detail}`;
     if (issueKeys.has(k)) return;
     issueKeys.add(k);
-    issues.push({ key, index, detail });
+    issues.push({ key, index, detail, severity: NOTES.has(key) ? "note" : "finding" });
   };
 
   const labels: string[] = [];

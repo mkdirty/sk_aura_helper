@@ -138,9 +138,16 @@ Phase 6 of [plans/phase6-cfg.md](plans/phase6-cfg.md); milestone M1 is built.
   dominators and post-dominators (Cooper–Harvey–Kennedy; post-dominators join every terminal in a
   virtual `SINK`).
 - **Printing** (`cfg-print.ts`): text (blocks with op headers from the decoder), DOT, JSON, and
-  the whole-project coverage report (`out/cfg/coverage.txt`), ranked like the decoder's.
+  the whole-project coverage report (`out/cfg/coverage.txt`): findings with their review status,
+  then notes ranked by count.
+- **Findings review** (`cfg-review.ts`, `cfg-review.json`): each issue is a `finding` (missing or
+  duplicate label, break outside a loop, unmodelled interpreter script, …) or a `note` (jump into
+  a block, computed jump, unreachable code). Findings are keyed `Map175/E22/p0#441
+  duplicate-label` and recorded with a hash of their command list and a short verdict; a test
+  fails on any finding that is new, or whose list changed since its review.
 - **Tests:** synthetic lists for each engine rule, a whole-project test that fails on unmodelled
-  interpreter tricks or a new kind of stale edge, and hand-checked snapshots (Map265/E8 p0, CE11).
+  interpreter tricks or a new kind of stale edge, the findings review, and hand-checked snapshots
+  (Map265/E8 p0, CE11).
 
 ## Headless harness (`src/harness/`)
 

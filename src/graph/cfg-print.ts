@@ -137,7 +137,7 @@ export class CfgCoverage {
   states = 0;
   staleEdges = 0;
   unreachable = 0;
-  private issues = new Map<string, { count: number; samples: string[] }>();
+  private issues = new Map<string, { severity: "finding" | "note"; count: number; samples: string[] }>();
 
   add(cfg: Cfg) {
     this.lists++;
@@ -150,7 +150,7 @@ export class CfgCoverage {
       this.staleEdges += es.filter((e) => e.stale).length;
     }
     for (const i of cfg.issues) {
-      const t = this.issues.get(i.key) ?? this.issues.set(i.key, { count: 0, samples: [] }).get(i.key)!;
+      const t = this.issues.get(i.key) ?? this.issues.set(i.key, { severity: i.severity, count: 0, samples: [] }).get(i.key)!;
       t.count++;
       if (t.samples.length < 5) t.samples.push(`${sourceLabel(cfg.source)}#${i.index}`);
     }
@@ -170,7 +170,17 @@ export class CfgCoverage {
   }
 }
 
-export function formatCfgCoverage(r: ReturnType<CfgCoverage["report"]>, title: string): string {
+/** A finding with its review status, for the report. */
+export interface ReviewedFinding {
+  key: string;
+  issue: string;
+  detail: string;
+  status: "reviewed" | "NEW" | "CHANGED";
+  note?: string;
+}
+
+export function formatCfgCoverage(r: ReturnType<CfgCoverage["report"]>, findings: ReviewedFinding[], title: string): string {
+  const open = findings.filter((f) => f.status !== "reviewed").length;
   const out = [
     title,
     "",
@@ -178,8 +188,11 @@ export function formatCfgCoverage(r: ReturnType<CfgCoverage["report"]>, title: s
     `${r.unreachable} commands never run (Skip bodies and code after unconditional jumps).`,
     `${r.staleEdges} edges depend on branch state the list didn't set (stale).`,
     "",
-    "Issues (per list and command), most frequent first:",
+    `Findings: possible mistakes in the game, or control flow the model doesn't cover. ${findings.length} in all, ${open} not reviewed.`,
+    "Review: `npm run cfg -- --review`; record with `npm run cfg -- --accept KEY… --note \"…\"`; explain in GAME-NOTES.",
   ];
-  for (const i of r.issues) out.push(`${String(i.count).padStart(7)}  ${i.key}    e.g. ${i.samples.join(", ")}`);
+  for (const f of findings) out.push(`  ${f.status.padEnd(8)}  ${f.key}${f.detail ? ` (${f.detail})` : ""}${f.note ? `: ${f.note}` : ""}`);
+  out.push("", "Notes: cases the graph handles, counted for reference (per list and command):");
+  for (const i of r.issues.filter((i) => i.severity === "note")) out.push(`${String(i.count).padStart(7)}  ${i.key}    e.g. ${i.samples.join(", ")}`);
   return out.join("\n") + "\n";
 }

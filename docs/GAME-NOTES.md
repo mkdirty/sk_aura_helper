@@ -315,8 +315,10 @@ The game already records what the player has seen, which a "see all content" rou
     separately by S9).
   - **Map265/E28 p3 (Lorraine's trial, autorun):** after Marie's second chance (#663) it jumps to
     `post_penalty`, which this page lacks (the other six trial pages have it: E28 p1, E29 p1/p3/p5,
-    E30 p3/p5). The page runs to its end instead of continuing with the hint and the retry;
-    being autorun, it then restarts from the top. Effect not yet confirmed in the harness.
+    E30 p3/p5). Confirmed in the harness (S717 ON, V260 = 17, V264 = 1, started at
+    `trial_failure`): the page runs to its end (#726) and, being autorun, restarts at #0, so the
+    cross-examination begins again from the first statement and Luciela's hint is skipped. The
+    retry still happens; no softlock.
   - **Map214/E19 p0 (Roland):** "Anything else?" then `jump MAIN` (#338), which doesn't exist, so
     the conversation ends instead of returning to the menu.
   Harmless: CE11's two `END_DAY` (nothing jumps to them); CE1005's jump (#406) correctly reaches

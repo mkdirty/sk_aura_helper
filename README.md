@@ -63,8 +63,18 @@ npm run cfg -- map 265 8 0 --dot    # Graphviz (pipe into `dot -Tsvg`); --json f
 The text form lists basic blocks (`#index command`) and their outgoing edges (`then`, `else`,
 `choice 1 "Leave."`, `win`, `jump present`, `repeat`, …). `END` is the end of the event,
 `GAME OVER` the game-over scene. Edges marked "stale branch state" are taken only when a choice or
-battle doesn't happen and a branch marker reads an old value; the coverage report counts them and
-ranks the issues found (jumps into blocks, computed jumps, missing labels, unreachable code).
+battle doesn't happen and a branch marker reads an old value.
+
+The coverage report has two parts. **Findings** are possible mistakes in the game (jumps to
+missing labels, duplicate labels) or control flow the model doesn't cover; each is reviewed and
+recorded in `src/graph/cfg-review.json` with a hash of its list, so a game update that adds or
+changes one shows up (and fails `npm test`). **Notes** count cases the graph handles (jumps into
+blocks, computed jumps, unreachable code).
+
+```sh
+npm run cfg -- --review                                   # findings not reviewed or changed; exit 1 if any
+npm run cfg -- --accept "Map214/E19/p0#338 jump-to-a-missing-label" --note "bug: …"
+```
 
 ### Where is X used: `npm run where`
 

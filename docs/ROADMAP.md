@@ -36,8 +36,9 @@ entry when it merges, moving what it adds into the table):
 
 - `cfg`: phase 6 milestone M1. Per-list control-flow graphs (`src/graph/`, `npm run cfg`): all
   24,162 lists in ~1.3 s, 223,614 commands run on some path, 268,033 edges, 19 unreachable
-  commands (all in Skip blocks), 73 stale edges; coverage report in `out/cfg/`. 18 new tests
-  (52 in all), with hand-checked snapshots of Map265/E8 p0 and CE11.
+  commands (all in Skip blocks), 73 stale edges; coverage report in `out/cfg/`, split into
+  findings (8, all reviewed in `src/graph/cfg-review.json`: 4 game bugs, 4 harmless) and notes.
+  19 new tests (53 in all), with hand-checked snapshots of Map265/E8 p0 and CE11.
 
 | Tool | State |
 | --- | --- |
@@ -76,10 +77,6 @@ entry when it merges, moving what it adds into the table):
   `ska_compendium::revealTrait`, so enemy 112's "sluggish" trait is never revealed there; and four
   missing/duplicate-label bugs found by the CFG (Map175/E22 dice prompt, Map109/E4 adult-content
   skip, Map265/E28 p3 trial retry, Map214/E19 menu loop). See GAME-NOTES "Bugs and quirks".
-- **CFG coverage report mixes notes with findings:** "jump enters a block", "dynamic jump" and
-  "unreachable commands" record handled cases; missing/duplicate labels are possible game bugs.
-  Split the report into "findings" and "notes", and let reviewed findings be marked as known (as
-  `plugin-review.json` does for plugin commands) so new ones stand out after a game update.
 - **Boot fix vs cross-check (2026-11-02):** until the fix, every harness run skipped the plugin
   processing done in `Scene_Boot.start` wrappers (passive skills, database inheritance, dynamic
   prices, artifacts, stance/enhance skills, NG+ skills). Re-running both cross-checks afterwards

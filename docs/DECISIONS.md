@@ -151,6 +151,12 @@ delegate to scenes and helpers in the same file. Code in *other* files (e.g. `sk
 `canSpendGold`, used by blessing) isn't covered. The first snapshot (2026-11-02) was recorded with
 `--accept-all` from the reviews made when each command was added, not a fresh re-read of all 103.
 
+**CFG findings are reviewed the same way (2026-11-02).** Missing or duplicate labels and other
+CFG findings are possible game bugs, not tool gaps, so they are listed apart from the notes
+(handled cases) and each review is recorded in `src/graph/cfg-review.json` with a hash of its
+command list. A test fails on a new finding or a changed list, so new ones stand out after an
+update instead of hiding among the counts.
+
 ### Unknown ids are recorded, not dropped (2026-11-02)
 
 A script write whose target can't be determined still produces an effect, with an unknown id.

@@ -1,0 +1,50 @@
+{
+  "CE1005#768 duplicate-label": {
+    "issue": "duplicate label (first wins)",
+    "detail": "EndLewdScene",
+    "listHash": "27b64f65aef4fce2",
+    "note": "harmless: the adult-content skip (#406) correctly reaches the first label; this one is a leftover"
+  },
+  "CE11#73 duplicate-label": {
+    "issue": "duplicate label (first wins)",
+    "detail": "END_DAY",
+    "listHash": "4c2648e70c970426",
+    "note": "harmless: nothing jumps to END_DAY"
+  },
+  "Map109/E1/p8#335 jump-to-a-missing-label": {
+    "issue": "jump to a missing label (does nothing)",
+    "detail": "REFUSE",
+    "listHash": "64ac96899cbf19b1",
+    "note": "harmless: Refuse ends the conversation, like Not now"
+  },
+  "Map109/E4/p4#134 jump-to-a-missing-label": {
+    "issue": "jump to a missing label (does nothing)",
+    "detail": "EndLewdScene",
+    "listHash": "28f3a7a722e74c84",
+    "note": "bug: adult content OFF doesn't skip the kiss scene's dialogue"
+  },
+  "Map175/E22/p0#441 duplicate-label": {
+    "issue": "duplicate label (first wins)",
+    "detail": "PLAYER_DEALER_ROLL",
+    "listHash": "c8350c9ee3fbbec7",
+    "note": "bug: invalid die number in the no-dealer branch jumps to the dealer branch's prompt (wrong message only)"
+  },
+  "Map214/E19/p0#338 jump-to-a-missing-label": {
+    "issue": "jump to a missing label (does nothing)",
+    "detail": "MAIN",
+    "listHash": "c0191a79e555cb06",
+    "note": "bug: 'Anything else?' ends the conversation instead of returning to the menu"
+  },
+  "Map244/E71/p0#58 jump-to-a-missing-label": {
+    "issue": "jump to a missing label (does nothing)",
+    "detail": "dontUse",
+    "listHash": "4001e8ad77fb7c98",
+    "note": "harmless: same as leaving"
+  },
+  "Map265/E28/p3#663 jump-to-a-missing-label": {
+    "issue": "jump to a missing label (does nothing)",
+    "detail": "post_penalty",
+    "listHash": "09bf92cca2d68902",
+    "note": "bug (harness-confirmed): Marie's second chance restarts the autorun trial page from #0, skipping the hint"
+  }
+}
