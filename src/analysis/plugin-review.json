@@ -1,0 +1,620 @@
+{
+  "adult_content_option:readAdultOption": {
+    "verdict": "modelled",
+    "handler": "07d58831a2f653d8",
+    "file": "js/plugins/auramz/adult_content_option.js",
+    "fileHash": "39bb8bf5b80272ee"
+  },
+  "advanced_item_select:addItemFilter": {
+    "verdict": "no effect",
+    "handler": "79297b6d988d926b",
+    "file": "js/plugins/auramz/advanced_item_select.js",
+    "fileHash": "033746f958e7dc3e"
+  },
+  "advanced_item_select:disableCancel": {
+    "verdict": "no effect",
+    "handler": "c7092c8fe52c15fc",
+    "file": "js/plugins/auramz/advanced_item_select.js",
+    "fileHash": "033746f958e7dc3e"
+  },
+  "advanced_pictures:attachChildren": {
+    "verdict": "no effect",
+    "handler": "30f17739aa52a85c",
+    "file": "js/plugins/auramz/advanced_pictures.js",
+    "fileHash": "394f83abaad9f003"
+  },
+  "advanced_pictures:copyPictureHierarchy": {
+    "verdict": "no effect",
+    "handler": "f76eee3b1840687d",
+    "file": "js/plugins/auramz/advanced_pictures.js",
+    "fileHash": "394f83abaad9f003"
+  },
+  "advanced_pictures:transferPictureToId": {
+    "verdict": "no effect",
+    "handler": "1ae5d136c81f7d83",
+    "file": "js/plugins/auramz/advanced_pictures.js",
+    "fileHash": "394f83abaad9f003"
+  },
+  "advanced_pictures:transition": {
+    "verdict": "no effect",
+    "handler": "906d6b926ebd99fc",
+    "file": "js/plugins/auramz/advanced_pictures.js",
+    "fileHash": "394f83abaad9f003"
+  },
+  "advanced_pictures:transitionTyped": {
+    "verdict": "no effect",
+    "handler": "be193066cc785b44",
+    "file": "js/plugins/auramz/advanced_pictures.js",
+    "fileHash": "394f83abaad9f003"
+  },
+  "advanced_pictures:waitForPictureMoveCommand": {
+    "verdict": "no effect",
+    "handler": "6056f59b6d29af79",
+    "file": "js/plugins/auramz/advanced_pictures.js",
+    "fileHash": "394f83abaad9f003"
+  },
+  "advanced_states:unlockStates": {
+    "verdict": "modelled",
+    "handler": "ecc69af14413fa92",
+    "file": "js/plugins/auramz/advanced_states.js",
+    "fileHash": "7d768df035ea62b7"
+  },
+  "ambush:makeNextBattleAmbush": {
+    "verdict": "no effect",
+    "handler": "721d854d3496799f",
+    "file": "js/plugins/auramz/ambush.js",
+    "fileHash": "a3b0d1611888cf01"
+  },
+  "analytics:sendDesignEvent": {
+    "verdict": "no effect",
+    "handler": null,
+    "file": "js/plugins/auramz/analytics.js",
+    "fileHash": "8f8728881ffdf47a"
+  },
+  "analytics:sendProgressionEvent": {
+    "verdict": "no effect",
+    "handler": null,
+    "file": "js/plugins/auramz/analytics.js",
+    "fileHash": "8f8728881ffdf47a"
+  },
+  "autosave:autosaveNow": {
+    "verdict": "no effect",
+    "handler": null,
+    "file": null,
+    "fileHash": null
+  },
+  "books:readBook": {
+    "verdict": "modelled",
+    "handler": "3d5217553390006c",
+    "file": "js/plugins/auramz/books.js",
+    "fileHash": "923bc29eea3ad792"
+  },
+  "books:setTargetActor": {
+    "verdict": "no effect",
+    "handler": "61b1b5bb64388f55",
+    "file": "js/plugins/auramz/books.js",
+    "fileHash": "923bc29eea3ad792"
+  },
+  "choices:createChoice": {
+    "verdict": "modelled",
+    "handler": "339c05f5c643f092",
+    "file": "js/plugins/auramz/choices.js",
+    "fileHash": "e16c852f253f0202"
+  },
+  "choices:setChoiceAlternateText": {
+    "verdict": "modelled",
+    "handler": "e02549314eeb0db8",
+    "file": "js/plugins/auramz/choices.js",
+    "fileHash": "e16c852f253f0202"
+  },
+  "choices:setChoiceColorCondition": {
+    "verdict": "modelled",
+    "handler": "ef5dcffa9f3a9642",
+    "file": "js/plugins/auramz/choices.js",
+    "fileHash": "e16c852f253f0202"
+  },
+  "choices:setChoiceOption": {
+    "verdict": "modelled",
+    "handler": "8602485c6757f40d",
+    "file": "js/plugins/auramz/choices.js",
+    "fileHash": "e16c852f253f0202"
+  },
+  "choices:setChoiceShowCondition": {
+    "verdict": "modelled",
+    "handler": "d55c744e8ad9f07f",
+    "file": "js/plugins/auramz/choices.js",
+    "fileHash": "e16c852f253f0202"
+  },
+  "choices:setHideSingleOptionChoices": {
+    "verdict": "modelled",
+    "handler": "570971e8c7a20b01",
+    "file": "js/plugins/auramz/choices.js",
+    "fileHash": "e16c852f253f0202"
+  },
+  "compendium:addBeastiaryEntry": {
+    "verdict": "modelled",
+    "handler": "deedc9ccdd8ae236",
+    "file": "js/plugins/auramz/compendium.js",
+    "fileHash": "954b216cb00cd0a3"
+  },
+  "compendium:addBossKill": {
+    "verdict": "modelled",
+    "handler": "ffb2e2618fcd8627",
+    "file": "js/plugins/auramz/compendium.js",
+    "fileHash": "954b216cb00cd0a3"
+  },
+  "compendium:revealAffinity": {
+    "verdict": "modelled",
+    "handler": "5f2463ca3a4ff49c",
+    "file": "js/plugins/auramz/compendium.js",
+    "fileHash": "954b216cb00cd0a3"
+  },
+  "compendium:revealAll": {
+    "verdict": "modelled",
+    "handler": "b247cdfe77e828cc",
+    "file": "js/plugins/auramz/compendium.js",
+    "fileHash": "954b216cb00cd0a3"
+  },
+  "compendium:revealSkill": {
+    "verdict": "modelled",
+    "handler": "24443b6f242e3bb5",
+    "file": "js/plugins/auramz/compendium.js",
+    "fileHash": "954b216cb00cd0a3"
+  },
+  "compendium:revealStat": {
+    "verdict": "modelled",
+    "handler": "6db746cb6cb26757",
+    "file": "js/plugins/auramz/compendium.js",
+    "fileHash": "954b216cb00cd0a3"
+  },
+  "compendium:revealTrait": {
+    "verdict": "modelled",
+    "handler": "384eb173b439fd14",
+    "file": "js/plugins/auramz/compendium.js",
+    "fileHash": "954b216cb00cd0a3"
+  },
+  "conditional_goods:setDiscount": {
+    "verdict": "modelled",
+    "handler": "15d5ba6ec379e99b",
+    "file": "js/plugins/auramz/conditional_goods.js",
+    "fileHash": "dc545a23a4d38b30"
+  },
+  "conditional_goods:setUnlockCondition": {
+    "verdict": "modelled",
+    "handler": "a022d143db6b8d0a",
+    "file": "js/plugins/auramz/conditional_goods.js",
+    "fileHash": "dc545a23a4d38b30"
+  },
+  "credits:playCredits": {
+    "verdict": "no effect",
+    "handler": "9d90a7484da40895",
+    "file": "js/plugins/auramz/credits.js",
+    "fileHash": "1f00719bc3bcdb00"
+  },
+  "detectors:stunDetector": {
+    "verdict": "no effect",
+    "handler": "fc9b8afaedc4693f",
+    "file": "js/plugins/auramz/detectors.js",
+    "fileHash": "f41aa7d54c0a3182"
+  },
+  "event_test:assertEquals": {
+    "verdict": "no effect",
+    "handler": null,
+    "file": null,
+    "fileHash": null
+  },
+  "event_test:assertTrue": {
+    "verdict": "no effect",
+    "handler": null,
+    "file": null,
+    "fileHash": null
+  },
+  "event_test:pressButton": {
+    "verdict": "no effect",
+    "handler": null,
+    "file": null,
+    "fileHash": null
+  },
+  "event_test:start": {
+    "verdict": "no effect",
+    "handler": null,
+    "file": null,
+    "fileHash": null
+  },
+  "event_test:success": {
+    "verdict": "no effect",
+    "handler": null,
+    "file": null,
+    "fileHash": null
+  },
+  "event_utils:callLocalEvent": {
+    "verdict": "modelled",
+    "handler": "90888c8bb8057ba3",
+    "file": "js/plugins/auramz/event_utils.js",
+    "fileHash": "73c6faa096b25cfb"
+  },
+  "event_utils:callLocalEventInline": {
+    "verdict": "modelled",
+    "handler": "3bd9ba32e5b8d3d2",
+    "file": "js/plugins/auramz/event_utils.js",
+    "fileHash": "73c6faa096b25cfb"
+  },
+  "event_utils:setActorDamageImage": {
+    "verdict": "no effect",
+    "handler": "10ed0b1c48725582",
+    "file": "js/plugins/auramz/event_utils.js",
+    "fileHash": "73c6faa096b25cfb"
+  },
+  "event_utils:setEventImageToActorDamageImage": {
+    "verdict": "no effect",
+    "handler": "e949e7cdf0e3657f",
+    "file": "js/plugins/auramz/event_utils.js",
+    "fileHash": "73c6faa096b25cfb"
+  },
+  "event_utils:setEventImageToActorImage": {
+    "verdict": "no effect",
+    "handler": "74d220d433fc2b32",
+    "file": "js/plugins/auramz/event_utils.js",
+    "fileHash": "73c6faa096b25cfb"
+  },
+  "extra_autosave_conditions:customAutosaveTrigger": {
+    "verdict": "no effect",
+    "handler": "89d71791b73ff5a7",
+    "file": "js/plugins/auramz/extra_autosave_conditions.js",
+    "fileHash": "4f389c07ecc189a0"
+  },
+  "FilterControllerMZ:createFilter": {
+    "verdict": "no effect",
+    "handler": "92556d42a6d84506",
+    "file": "js/plugins/thirdparty/FilterControllerMZ.js",
+    "fileHash": "13fe20a9c7f850ef"
+  },
+  "FilterControllerMZ:eraseAllFilter": {
+    "verdict": "no effect",
+    "handler": "b0844f3ff701781a",
+    "file": "js/plugins/thirdparty/FilterControllerMZ.js",
+    "fileHash": "13fe20a9c7f850ef"
+  },
+  "FilterControllerMZ:eraseFilter": {
+    "verdict": "no effect",
+    "handler": "f795e445cf612959",
+    "file": "js/plugins/thirdparty/FilterControllerMZ.js",
+    "fileHash": "13fe20a9c7f850ef"
+  },
+  "FilterControllerMZ:eraseFilterAfterMove": {
+    "verdict": "no effect",
+    "handler": "e11267e206edb800",
+    "file": "js/plugins/thirdparty/FilterControllerMZ.js",
+    "fileHash": "13fe20a9c7f850ef"
+  },
+  "FilterControllerMZ:moveFilter": {
+    "verdict": "no effect",
+    "handler": "441321909269f44b",
+    "file": "js/plugins/thirdparty/FilterControllerMZ.js",
+    "fileHash": "13fe20a9c7f850ef"
+  },
+  "FilterControllerMZ:setFilter": {
+    "verdict": "no effect",
+    "handler": "e04906571b8fe8fd",
+    "file": "js/plugins/thirdparty/FilterControllerMZ.js",
+    "fileHash": "13fe20a9c7f850ef"
+  },
+  "FilterControllerMZ:setFilterSpeed": {
+    "verdict": "no effect",
+    "handler": "c13805ceaf2bb105",
+    "file": "js/plugins/thirdparty/FilterControllerMZ.js",
+    "fileHash": "13fe20a9c7f850ef"
+  },
+  "ironman:activate": {
+    "verdict": "no effect",
+    "handler": "98415247a65406a2",
+    "file": "js/plugins/auramz/ironman.js",
+    "fileHash": "202bf507fcc0f6ec"
+  },
+  "MPP_CharacterMake_TLB:changeAccB": {
+    "verdict": "no effect",
+    "handler": "c8ca7739b140c283",
+    "file": "js/plugins/thirdparty/MPP_CharacterMake_TLB.js",
+    "fileHash": "7cac6c7eda6b0c7e"
+  },
+  "MPP_CharacterMake_TLB:changeBeastEars": {
+    "verdict": "no effect",
+    "handler": "3d5171a1d4e53492",
+    "file": "js/plugins/thirdparty/MPP_CharacterMake_TLB.js",
+    "fileHash": "7cac6c7eda6b0c7e"
+  },
+  "MPP_CharacterMake_TLB:changeClothing": {
+    "verdict": "no effect",
+    "handler": "845934a52aa27c74",
+    "file": "js/plugins/thirdparty/MPP_CharacterMake_TLB.js",
+    "fileHash": "7cac6c7eda6b0c7e"
+  },
+  "MPP_CharacterMake_TLB:changeColour": {
+    "verdict": "no effect",
+    "handler": "6bbf2d6cca7bc8ce",
+    "file": "js/plugins/thirdparty/MPP_CharacterMake_TLB.js",
+    "fileHash": "7cac6c7eda6b0c7e"
+  },
+  "MPP_CharacterMake_TLB:changeHair": {
+    "verdict": "no effect",
+    "handler": "4c3a63a48380700c",
+    "file": "js/plugins/thirdparty/MPP_CharacterMake_TLB.js",
+    "fileHash": "7cac6c7eda6b0c7e"
+  },
+  "MPP_CharacterMake_TLB:changePart": {
+    "verdict": "no effect",
+    "handler": "2c0d71a64e5dfd2b",
+    "file": "js/plugins/thirdparty/MPP_CharacterMake_TLB.js",
+    "fileHash": "7cac6c7eda6b0c7e"
+  },
+  "MPP_CharacterMake_TLB:changeTail": {
+    "verdict": "no effect",
+    "handler": "4ddb7623cc5a98bf",
+    "file": "js/plugins/thirdparty/MPP_CharacterMake_TLB.js",
+    "fileHash": "7cac6c7eda6b0c7e"
+  },
+  "MPP_CharacterMake_TLB:changeWing": {
+    "verdict": "no effect",
+    "handler": "e4a3fc9a619882cd",
+    "file": "js/plugins/thirdparty/MPP_CharacterMake_TLB.js",
+    "fileHash": "7cac6c7eda6b0c7e"
+  },
+  "MPP_CharacterMake_TLB:openScene": {
+    "verdict": "no effect",
+    "handler": "579b6e03e93b6552",
+    "file": "js/plugins/thirdparty/MPP_CharacterMake_TLB.js",
+    "fileHash": "7cac6c7eda6b0c7e"
+  },
+  "MPP_CharacterMake_TLB:switchActorDamageTV": {
+    "verdict": "no effect",
+    "handler": "05eaa4b0a759c2b1",
+    "file": "js/plugins/thirdparty/MPP_CharacterMake_TLB.js",
+    "fileHash": "7cac6c7eda6b0c7e"
+  },
+  "MPP_CharacterMake_TLB:switchPartyDamageTV": {
+    "verdict": "no effect",
+    "handler": "e8db3e719abcd846",
+    "file": "js/plugins/thirdparty/MPP_CharacterMake_TLB.js",
+    "fileHash": "7cac6c7eda6b0c7e"
+  },
+  "newgame_plus_skills:initCarryOverSkills": {
+    "verdict": "modelled",
+    "handler": "7e1df24bdd79c51b",
+    "file": "js/plugins/auramz/newgame_plus_skills.js",
+    "fileHash": "e57deb5f605d64c0"
+  },
+  "newgame_plus_skills:showOptionsForSkills": {
+    "verdict": "modelled",
+    "handler": "a1e05909d23a070c",
+    "file": "js/plugins/auramz/newgame_plus_skills.js",
+    "fileHash": "e57deb5f605d64c0"
+  },
+  "newgame_plus:carryOverSwitchRange": {
+    "verdict": "no effect",
+    "handler": "ef0e08c0ac5ef5ed",
+    "file": "js/plugins/auramz/newgame_plus.js",
+    "fileHash": "4e8ffca167514abe"
+  },
+  "newgame_plus:carryOverVariableRange": {
+    "verdict": "no effect",
+    "handler": "ca09845c9db5c973",
+    "file": "js/plugins/auramz/newgame_plus.js",
+    "fileHash": "4e8ffca167514abe"
+  },
+  "newgame_plus:startNewGamePlus": {
+    "verdict": "modelled",
+    "handler": "f73dc8eb2ff0bf92",
+    "file": "js/plugins/auramz/newgame_plus.js",
+    "fileHash": "4e8ffca167514abe"
+  },
+  "NGT_Shatter:shatterPicture": {
+    "verdict": "no effect",
+    "handler": "307c060273a0ff0b",
+    "file": "js/plugins/thirdparty/NGT_Shatter.js",
+    "fileHash": "91e5539a06a77a3b"
+  },
+  "obstacles_choices:showChociesForObstacle": {
+    "verdict": "modelled",
+    "handler": "7de83c8ea539957e",
+    "file": "js/plugins/auramz/obstacles_choices.js",
+    "fileHash": "7b065b3ec3935ac7"
+  },
+  "pixel_animations:interruptAnimation": {
+    "verdict": "no effect",
+    "handler": "4b4497a15f44fcc4",
+    "file": "js/plugins/auramz/pixel_animations.js",
+    "fileHash": "3ae38822d2612d19"
+  },
+  "pixel_animations:resumeAnimation": {
+    "verdict": "no effect",
+    "handler": "698d8036b69fc45f",
+    "file": "js/plugins/auramz/pixel_animations.js",
+    "fileHash": "3ae38822d2612d19"
+  },
+  "quests:addObjective": {
+    "verdict": "modelled",
+    "handler": "6f3cd94672ba8ee0",
+    "file": "js/plugins/auramz/quests.js",
+    "fileHash": "a16ed336113175c4"
+  },
+  "quests:addQuest": {
+    "verdict": "modelled",
+    "handler": "be26d050129f102f",
+    "file": "js/plugins/auramz/quests.js",
+    "fileHash": "a16ed336113175c4"
+  },
+  "quests:overrideReward": {
+    "verdict": "modelled",
+    "handler": "957f4004b9f901cd",
+    "file": "js/plugins/auramz/quests.js",
+    "fileHash": "a16ed336113175c4"
+  },
+  "quests:setObjectiveStatus": {
+    "verdict": "modelled",
+    "handler": "7bf2826c866c951e",
+    "file": "js/plugins/auramz/quests.js",
+    "fileHash": "a16ed336113175c4"
+  },
+  "quests:setQuestStatus": {
+    "verdict": "modelled",
+    "handler": "c98733804d158a13",
+    "file": "js/plugins/auramz/quests.js",
+    "fileHash": "a16ed336113175c4"
+  },
+  "quests:updatedObjectiveDescription": {
+    "verdict": "modelled",
+    "handler": "ac42556b9058ca91",
+    "file": "js/plugins/auramz/quests.js",
+    "fileHash": "a16ed336113175c4"
+  },
+  "quests:updateReward": {
+    "verdict": "modelled",
+    "handler": "18eef46a96e8fbe9",
+    "file": "js/plugins/auramz/quests.js",
+    "fileHash": "a16ed336113175c4"
+  },
+  "selfswitches_utils:setExternalSelfSwitch": {
+    "verdict": "modelled",
+    "handler": "1cdc474596f4e1c5",
+    "file": "js/plugins/auramz/selfswitches_utils.js",
+    "fileHash": "c7622e892e0bfdbb"
+  },
+  "selfswitches_utils:setExternalSelfSwitchRange": {
+    "verdict": "modelled",
+    "handler": "5e12fbc10c7d745f",
+    "file": "js/plugins/auramz/selfswitches_utils.js",
+    "fileHash": "c7622e892e0bfdbb"
+  },
+  "selfswitches_utils:setLocalSelfSwitch": {
+    "verdict": "modelled",
+    "handler": "660fe623fdc394a6",
+    "file": "js/plugins/auramz/selfswitches_utils.js",
+    "fileHash": "c7622e892e0bfdbb"
+  },
+  "selfswitches_utils:setLocalSelfSwitchRange": {
+    "verdict": "modelled",
+    "handler": "d5056fb696de434f",
+    "file": "js/plugins/auramz/selfswitches_utils.js",
+    "fileHash": "c7622e892e0bfdbb"
+  },
+  "selfswitches_utils:synchronizeLocalSelfSwitches": {
+    "verdict": "modelled",
+    "handler": "61f9664cf64ced06",
+    "file": "js/plugins/auramz/selfswitches_utils.js",
+    "fileHash": "c7622e892e0bfdbb"
+  },
+  "ska_compendium:revealTrait": {
+    "verdict": "no effect",
+    "handler": null,
+    "file": "js/plugins/ska_compendium.js",
+    "fileHash": "e693f61e332e9cab"
+  },
+  "standing_images:hide": {
+    "verdict": "no effect",
+    "handler": "924b28319237eab9",
+    "file": "js/plugins/auramz/standing_images.js",
+    "fileHash": "08548a96699dc768"
+  },
+  "standing_images:lockDim": {
+    "verdict": "no effect",
+    "handler": "1af4241276de0d8e",
+    "file": "js/plugins/auramz/standing_images.js",
+    "fileHash": "08548a96699dc768"
+  },
+  "standing_images:setNameMap": {
+    "verdict": "no effect",
+    "handler": "8bffa49b1a45f434",
+    "file": "js/plugins/auramz/standing_images.js",
+    "fileHash": "08548a96699dc768"
+  },
+  "standing_images:show": {
+    "verdict": "no effect",
+    "handler": "439a0962b6eb5a8b",
+    "file": "js/plugins/auramz/standing_images.js",
+    "fileHash": "08548a96699dc768"
+  },
+  "steam:activateAchievement": {
+    "verdict": "modelled",
+    "handler": "6d79791722d4e8fa",
+    "file": "js/plugins/deploy/steam.js",
+    "fileHash": "7c46167a272ef801"
+  },
+  "SteamLinkCommandsAddon:activateAchievement": {
+    "verdict": "no effect",
+    "handler": "6b51917dc4acc3a4",
+    "file": "js/plugins/thirdparty/SteamLinkCommandsAddon.js",
+    "fileHash": "ebad44cebd12a6d0"
+  },
+  "SteamLinkCommandsAddon:getAchievementCount": {
+    "verdict": "modelled",
+    "handler": "c44d5b533927504b",
+    "file": "js/plugins/thirdparty/SteamLinkCommandsAddon.js",
+    "fileHash": "ebad44cebd12a6d0"
+  },
+  "SteamLinkCommandsAddon:getStatInt": {
+    "verdict": "modelled",
+    "handler": "df1ff648b4fd62cc",
+    "file": "js/plugins/thirdparty/SteamLinkCommandsAddon.js",
+    "fileHash": "ebad44cebd12a6d0"
+  },
+  "SteamLinkCommandsAddon:storeStats": {
+    "verdict": "no effect",
+    "handler": "fac4d12e3c5d181e",
+    "file": "js/plugins/thirdparty/SteamLinkCommandsAddon.js",
+    "fileHash": "ebad44cebd12a6d0"
+  },
+  "text_utils:addMessage": {
+    "verdict": "no effect",
+    "handler": "28120d38e7e861b6",
+    "file": "js/plugins/auramz/text_utils.js",
+    "fileHash": "80d1b5b839dfdcd5"
+  },
+  "text_utils:showTemplateMessage": {
+    "verdict": "no effect",
+    "handler": "355dd8bafbabf249",
+    "file": "js/plugins/auramz/text_utils.js",
+    "fileHash": "80d1b5b839dfdcd5"
+  },
+  "TLB_SKABlessMenu:openScene": {
+    "verdict": "modelled",
+    "handler": "0c94f993ee1329a5",
+    "file": "js/plugins/auramzui/TLB_SKABlessMenu.js",
+    "fileHash": "2b9f7ae7b49747bf"
+  },
+  "TLB_SKACraftMenu:openScene": {
+    "verdict": "modelled",
+    "handler": "c42c5f3ef52c4c36",
+    "file": "js/plugins/auramzui/TLB_SKACraftMenu.js",
+    "fileHash": "85da9bd644c60d45"
+  },
+  "TLB_SKACraftMenu:openSceneDatabase": {
+    "verdict": "unanalyzed",
+    "handler": "2e8e76d8adb1e376",
+    "file": "js/plugins/auramzui/TLB_SKACraftMenu.js",
+    "fileHash": "85da9bd644c60d45"
+  },
+  "TLB_SKASelectSkill:selectSkill": {
+    "verdict": "modelled",
+    "handler": "f7b2d841a09d7b86",
+    "file": "js/plugins/auramz/TLB_SKASelectSkill.js",
+    "fileHash": "c8fba6e292eabb77"
+  },
+  "TLB_SKAShop:item_setup": {
+    "verdict": "no effect",
+    "handler": "7e60dc5d9bc1a6c4",
+    "file": "js/plugins/auramzui/TLB_SKAShop.js",
+    "fileHash": "f48e998e2ac885d8"
+  },
+  "TLB_SKAShop:merchant_setup": {
+    "verdict": "no effect",
+    "handler": "eb7aa74b6adef8e6",
+    "file": "js/plugins/auramzui/TLB_SKAShop.js",
+    "fileHash": "f48e998e2ac885d8"
+  },
+  "TorigoyaMZ_SkillCutIn:showActorCutIn": {
+    "verdict": "no effect",
+    "handler": "6fea08b3130c64fe",
+    "file": "js/plugins/thirdparty/TorigoyaMZ_SkillCutIn.js",
+    "fileHash": "d66a06bc259d8999"
+  }
+}

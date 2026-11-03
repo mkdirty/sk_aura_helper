@@ -3,6 +3,7 @@
 import type { GameData } from "../data/game-data.ts";
 import { gameBlessings } from "./blessing.ts";
 import { gameBooks } from "./books.ts";
+import { gameCarryOverSkills } from "./newgame-plus.ts";
 import { engineRouteNames } from "../events/decode.ts";
 import type { XrefOptions } from "./xref.ts";
 
@@ -10,6 +11,9 @@ export function analysisContext(data: GameData): XrefOptions {
   return {
     data,
     decode: { routeNames: engineRouteNames(data.dir) },
-    effects: { pluginParams: (name) => data.pluginParams(name), books: gameBooks(data), blessings: gameBlessings(data) },
+    effects: { pluginParams: (name) => data.pluginParams(name), books: gameBooks(data), blessings: gameBlessings(data),
+      carryOverSkills: gameCarryOverSkills(data),
+      startMapId: Number(data.system.startMapId),
+    },
   };
 }

@@ -74,6 +74,8 @@ export class Harness {
   readonly blockedWrites: BlockedWrite[] = [];
   readonly requests: string[] = [];
   readonly sceneRequests: string[] = [];
+  /** While Scene_Boot.start runs, scene requests are recorded but don't stop it (runBootScene). */
+  private bootScene = false;
   /** The game's console output. */
   readonly logs: Array<{ level: string; text: string }> = [];
   /** Maps the player has been transferred to, in order (map 0 included). */
@@ -224,8 +226,9 @@ export class Harness {
   /**
    * Runs the real Scene_Boot lifecycle (create → isReady polling → start), so every plugin
    * hook on it runs: database loading (promise-based; the mod loader goes first), template
-   * events, notetag processing, player data. `start` ends by asking for the title scene,
-   * which is where boot stops.
+   * events, notetag processing, player data. `start` asks for the title scene; that request is
+   * recorded without throwing, because plugins wrap `start` and do their processing *after* the
+   * original returns (passive skills, database inheritance, carry-over skills, …).
    */
   private async runBootScene(saveDir: string | undefined) {
     const { Scene_Boot, StorageManager } = this.g;
@@ -237,13 +240,16 @@ export class Harness {
     this.g.Input.initialize();
     this.g.TouchInput.initialize();
 
+    // No renderer headless: resizing the screen is presentation (no plugin wraps it).
+    Scene_Boot.prototype.resizeScreen = () => {};
     const boot = new Scene_Boot();
     boot.create();
     await this.waitFor(() => boot.isReady(), "boot scene");
+    this.bootScene = true;
     try {
       boot.start();
-    } catch (e) {
-      if (!(e instanceof SceneRequest)) throw e;
+    } finally {
+      this.bootScene = false;
     }
     this.sceneRequests.length = 0;
 
@@ -279,7 +285,7 @@ export class Harness {
     const intercept = (Scene: { name?: string } | null) => {
       const name = Scene?.name ?? String(Scene);
       this.sceneRequests.push(name);
-      throw new SceneRequest(name);
+      if (!this.bootScene) throw new SceneRequest(name);
     };
     SceneManager.push = intercept;
     SceneManager.goto = intercept;

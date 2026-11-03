@@ -143,6 +143,14 @@ Each plugin command's effects are written from its registered handler's source (
 -- handler plugin:command`), not guessed from names. Commands with no persistent effect are listed
 explicitly, each checked against its handler. Everything else is reported as unanalyzed.
 
+**Reviews are recorded and expire (2026-11-02).** `src/analysis/plugin-review.json` records, for
+every command with a verdict, hashes of the registered handler and of the plugin file defining it.
+A test fails when either changes after a game update, or when the events use a command with no
+verdict, so a review can't silently go stale. The file hash is included because handlers often
+delegate to scenes and helpers in the same file. Code in *other* files (e.g. `ska_curses.js`'s
+`canSpendGold`, used by blessing) isn't covered. The first snapshot (2026-11-02) was recorded with
+`--accept-all` from the reviews made when each command was added, not a fresh re-read of all 103.
+
 ### Unknown ids are recorded, not dropped (2026-11-02)
 
 A script write whose target can't be determined still produces an effect, with an unknown id.
@@ -166,6 +174,20 @@ The user proposed a symbols database (e.g. `S22 noCollar` → `switch.no_collar`
 
 Facts behind this: every used switch/variable is named, and names are unique apart from one
 section header (see GAME-NOTES).
+
+### Runtime-chosen plugin data is listed in full, labelled (2026-11-02)
+
+When a plugin command's effect depends on state the index doesn't track (which book a companion
+holds, which bless skill is active, which NG+ skills were picked), the handler lists every
+possibility the data allows and labels each with its condition ("with skill 390", "if
+selected"), rather than reporting it unanalyzed. That over-approximates per call site, and the
+label says how.
+
+### New Game+ is a playthrough boundary (2026-11-02)
+
+`startNewGamePlus` is indexed as a call to the start map, not as writes to every switch and
+variable it resets. The index describes one playthrough; carry-over is recorded as facts (which
+ranges, which skills) for the deferred route semantics to use.
 
 ## Runtime cross-check
 

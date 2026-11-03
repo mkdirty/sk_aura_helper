@@ -82,8 +82,18 @@ the event actually runs.
   modelled, like the engine's Change Parameter: there's no parameter entity.
 - **Blessing** (`blessing.ts`, `TLB_SKABlessMenu:openScene` handler): blessable item pairs
   derived from note tags, with the bless skills that allow each. The skill in force is runtime
-  state, so every call site lists every pair, labelled "with skill 389/390". `test/blessing.test.ts`
-  checks the derived pairs against the plugin's own `itemValid` in the harness.
+  state, so every call site lists every pair, labelled "with skill 389/390" (checked against the
+  plugin's own `itemValid`).
+- **New Game+** (`newgame-plus.ts`): the carry-over skill list (`<score_cost>`). The
+  `initCarryOverSkills` handler lists every one as a possible learn; `startNewGamePlus` is a
+  call to the start map, and its reset isn't listed per entity, since it ends the playthrough.
+  `test/plugin-models.test.ts` checks the list, and the blessing pairs, against the plugins'
+  own code in the harness.
+- **Plugin reviews** (`plugin-review.ts`, `plugin-review.json`, `npm run plugins`): each command
+  with a verdict in `effects.ts` (modelled / no effect / unanalyzed), with sha256 prefixes of its
+  registered handler's source and its plugin file, read from a booted harness.
+  `test/plugin-review.test.ts` fails on a changed hash, a verdict without a record (or the
+  reverse), and an event-used command without a verdict.
 - Note tags are parsed by `notes.ts`, matching `DataManager.extractMetadata`.
 - **Crafting** (`TLB_SKACraftMenu:openScene` handler): per recipe, the target item is "crafted
   (into stock V…)", ingredients are lost, the stock variable is written, and the success switch
@@ -102,7 +112,9 @@ the event actually runs.
   directory) and records swallowed writes; fake timers; a seeded `Math.random`.
 - **Boot:** the `js/main.js` script list (minus audio decoding and Effekseer, which start
   workers/WASM), `PluginManager.setup($plugins)`, then `Scene_Boot` (`create` → `isReady` polling
-  → `start`). The context has its own microtask queue, drained explicitly, so the game's promises
+  → `start`). Scene requests during `start` are recorded without throwing, because plugins do
+  their processing in `start` wrappers after the original returns; `resizeScreen` is stubbed (no
+  renderer). The context has its own microtask queue, drained explicitly, so the game's promises
   settle deterministically while the frame loop stays synchronous. Player data comes from an
   empty profile unless `saveDir` is given. An uncreated `Scene_Map` stands in for
   `SceneManager._scene`; autosaves are recorded, not written.

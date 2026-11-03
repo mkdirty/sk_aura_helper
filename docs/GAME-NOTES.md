@@ -54,7 +54,9 @@ IDs follow the tools' notation: `S22` switch, `V31` variable, `CE11` common even
   (CustomTranslationEngine, backlog, TemplateEvent), 117 (ska_analytics), 301 (ambush), 352
   (ironman). The disabled MUSH_Audio_Engine would also override 354.
 - **Boot:** about two dozen plugins hook `Scene_Boot`. TemplateEvent loads its template map
-  there; artifact, passive skills, NG+ skills and others process database notes there. Data
+  there; artifact, passive skills, NG+ skills and others process database notes there, mostly
+  in `start` wrappers that run *after* the original `start` (which asks for the title scene),
+  so a host must let `start` return normally. Data
   loading is promise-based: the mod loader loads mods first, then the database, and applies mods
   to each data file and map asynchronously.
 - **TemplateEvent:** events with a `<TE:name>` (or `<TE:id>`) note run a template event's data
@@ -197,7 +199,9 @@ The game already records what the player has seen, which a "see all content" rou
     day (ends with CE11 `endDay`).
   - **Companions** (actors 2, 3, 4, 16) are gifted a book at Map007 "Gift Item" (CE882 sets
     `currentBook` and *loses the item*), then progress nightly through CE883 → `books:readBook`.
-    The registered `books:assignBook` is never used.
+    The target companion is passed through `books:setTargetActor` (stores
+    `$gameParty._targetActorId`, which CE109 `calcActorId` copies to V36). The registered
+    `books:assignBook` is never used.
 - **Crafting** (`TLB_SKACraftMenu:openScene`, 4 places: Map009/E1 alchemist, Map181/E4 Louise
   (general shop), Map218/E6 (artifact workshop), Map226/E4 (elixir alchemist)) doesn't give the item. Each craft loses the ingredients and adds the
   recipe quantity (or the efficiency variable, if larger) to a **stock variable**, which that
@@ -211,7 +215,15 @@ The game already records what the player has seen, which a "see all content" rou
   Bless Item I, Map225/E60 Bless Item II, chosen by `$gameTemp.setLastUsedSkillId` just
   before). Gold blessing is blocked while the leader has Eyes of Greed at willpower ≤ 0
   (`ska_curses.js` `canSpendGold`).
-- **Unmodelled sources:** NG+ skill carry-over.
+- **New Game+** (Map073 "ClearRoom"): E6 registers the carried-over ranges (V405–423, V425–440,
+  V802–880, V1061–1100; S8, S402–500, S661–700, S782–790, S1002–1100), then
+  `startNewGamePlus` resets everything else (`setupNewGame`) and starts over on Map001. The ranges
+  are plugin-module state, not saved: they only exist because E6 registers them just before.
+  - **Carry-over skills:** the 41 skills with `<score_cost:N>` (e.g. Fire I costs 8). E22's
+    picker spends score (V410 spent, within V406 total) on skills Aura learned in *any* earlier
+    playthrough (`AuraMZ.learnedSkills`, saved with the game). CE20 `startMainGame` teaches the
+    selected ones (`initCarryOverSkills`), and adds the NG+ stat, bomb and gold bonuses (V411–423).
+  - `newgame_plus_skills:carryOverSkill` is registered but unused.
 - Example, **Fire I (skill 26):** learned at Map007/E8 `charlotte`; **forgotten** at Map007/E11
   and Map209/E35 (probably the upgrade to Fire II); learned at level 1 by classes 3 "Mage",
   15 and 23 (fire slimes). A lewd variant exists (712 "Fire II (Lewd Knowledge 20)"). So

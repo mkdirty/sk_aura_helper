@@ -63,6 +63,10 @@ export interface EffectContext {
   books: Book[];
   /** Items the bless menu can turn into their blessed versions (blessing.ts). */
   blessings: Blessing[];
+  /** Skills New Game+ can carry over (newgame-plus.ts). */
+  carryOverSkills: number[];
+  /** System.json startMapId: where a new game (and New Game+) begins. */
+  startMapId: number;
 }
 
 const valueId = (v: Value): Id => (v.kind === "const" ? v.value : { var: v.id });
@@ -147,9 +151,6 @@ const PRESENTATION = new Set([
 
 /** Known-but-unmodelled plugin commands, with what they do. */
 const UNANALYZED_NOTES: Record<string, string> = {
-  "newgame_plus_skills:initCarryOverSkills": "plugin newgame_plus_skills:initCarryOverSkills (learns NG+ carried skills)",
-  "newgame_plus_skills:showOptionsForSkills": "plugin newgame_plus_skills:showOptionsForSkills (NG+ skill picker)",
-  "newgame_plus:startNewGamePlus": "plugin newgame_plus:startNewGamePlus",
   "TLB_SKACraftMenu:openSceneDatabase": "plugin TLB_SKACraftMenu:openSceneDatabase (crafting from the formula database)",
 };
 
@@ -311,6 +312,41 @@ PLUGIN_EFFECTS["TLB_SKABlessMenu:openScene"] = (a, ctx, out) => {
     out.effects.push({ entity: { kind: "gold" }, access: "write", how: "lose (blessing, 4 × item price each)", sign: -1 });
   }
 };
+
+// New Game+ (see newgame-plus.ts). Which skills are selected is outside tracked state, so every
+// carry-over skill is listed.
+PLUGIN_EFFECTS["newgame_plus_skills:initCarryOverSkills"] = (_a, ctx, out) => {
+  for (const id of ctx.carryOverSkills) out.effects.push({ entity: { kind: "skill", id }, access: "write", how: "learn (actor 1, NG+ carry-over if selected)" });
+};
+// The picker toggles skills, adding or refunding their cost in the spent-score variable, within
+// the total-score variable.
+PLUGIN_EFFECTS["newgame_plus_skills:showOptionsForSkills"] = (_a, ctx, out) => {
+  const p = ctx.pluginParams("newgame_plus_skills");
+  const spent = Number(p.spentScoreVar);
+  const total = Number(p.totalScoreVar);
+  out.effects.push({ entity: { kind: "variable", id: total }, access: "read", how: "value (NG+ total score)" });
+  out.effects.push({ entity: { kind: "variable", id: spent }, access: "read", how: "value (NG+ spent score)" });
+  out.effects.push({ entity: { kind: "variable", id: spent }, access: "write", how: "+/- skill score cost (NG+ skill picker)" });
+  for (const id of ctx.carryOverSkills) out.effects.push({ entity: { kind: "skill", id }, access: "read", how: "learned in any playthrough? (NG+ skill picker)" });
+};
+// A full reset (DataManager.setupNewGame) keeping the registered carry-over ranges, then the
+// start map. The reset isn't listed per entity: it ends the playthrough.
+PLUGIN_EFFECTS["newgame_plus:startNewGamePlus"] = (_a, ctx, out) => {
+  out.effects.push({ entity: { kind: "map", id: ctx.startMapId }, access: "call", how: "New Game+ (resets all but carried-over ranges)" });
+};
+
+/** How a plugin command is handled by the analysis, by `plugin:command` key (see plugin-review.ts). */
+export type PluginVerdict = "modelled" | "no effect" | "unanalyzed";
+
+export function pluginVerdict(key: string): PluginVerdict | undefined {
+  if (key in PLUGIN_EFFECTS) return "modelled";
+  if (PRESENTATION.has(key)) return "no effect";
+  if (key in UNANALYZED_NOTES) return "unanalyzed";
+  return undefined;
+}
+
+/** Every command the analysis has a verdict for. */
+export const reviewedPluginCommands = (): string[] => [...Object.keys(PLUGIN_EFFECTS), ...PRESENTATION, ...Object.keys(UNANALYZED_NOTES)].sort();
 
 function localEvent(a: Record<string, any>, out: OpEffects, asCaller: boolean) {
   const eventId = expressionId(String(a.eventID));

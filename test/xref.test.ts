@@ -66,6 +66,11 @@ describe("books and crafting (from the plugins' handlers and item notes)", () =>
     expect(where("item", 303).some((r) => r.effect.how.startsWith("lose (blessed into"))).toBe(false);
   });
 
+  it("New Game+: Fire I (26) can be carried over by CE20; the reset is a call to the start map", () => {
+    expect(where("skill", 26).map((r) => `${label(r)} ${r.effect.how}`)).toContain("CE20#15 learn (actor 1, NG+ carry-over if selected)");
+    expect(where("map", 1).map((r) => `${label(r)} ${r.effect.how}`)).toContain("Map073/E6/p0#48 New Game+ (resets all but carried-over ranges)");
+  });
+
   it("Louise's crafting (Map181/E4): bombs into stock V506 from item 204, success switch S45", () => {
     const at = (refs: Ref[]) => refs.filter((r) => label(r) === "Map181/E4/p0#42").map((r) => r.effect.how);
     expect(at(where("item", 7))).toContain("crafted (into stock V506, 5 per craft)");

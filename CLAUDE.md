@@ -42,11 +42,16 @@ Each file holds one kind of thing. Put new information where it belongs:
 - **Plugin command effects:** write handlers from the *registered* implementation
   (`npm run harness -- handler plugin:command`), not the command's name. Add them to
   `PLUGIN_EFFECTS` in `src/analysis/effects.ts`, or to `PRESENTATION` if the handler has no
-  persistent effect. Unhandled ones are ranked in `npm run where -- unanalyzed`.
+  persistent effect. Unhandled ones are ranked in `npm run where -- unanalyzed`. Then record the
+  review: `npm run plugins -- --accept plugin:command`. After a game update, `npm run plugins`
+  lists handlers that changed since their review: re-read each before accepting it.
 - **Index soundness:** run `npm run crosscheck` (~5s) or `-- --pages` (~28 min). Diagnose the top
   unexplained group with `npm run harness -- who <target> page <map> <event> <page>`, fix, then
   `npm run crosscheck -- --rerun-unexplained` (seconds). Record what the fix taught in
-  GAME-NOTES / ARCHITECTURE.
+  GAME-NOTES / ARCHITECTURE. Run `--pages` in the background with output to a log, and before
+  reading results confirm it really finished (the log/report header says "10738 runs" or so;
+  background-task notices have fired early). Compare against the previous
+  `results.full-pages.json` before overwriting it matters.
 - **Harness runs need a game in progress:** new game, CE16 `initGame`, then construct actor 1
   *before* adding her (adding first recurses forever via MPP). `startGameInProgress()` in
   `src/harness/trace.ts` does this. Many common events need caller-provided arguments, so map

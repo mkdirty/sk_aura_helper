@@ -3,7 +3,8 @@
 //   npm run crosscheck [-- --ce 12 --ce 785] [--pages] [--map 7 …] [--frames 3000] [--out DIR]
 // Default: every common event. --pages: every map event page instead (or those of --map).
 // --rerun-unexplained: only the entries that had unexplained changes in the previous results.json.
-// Writes out/crosscheck/report.txt (+ results.json) and prints a summary.
+// Writes out/crosscheck/report.txt (+ results.json) and prints a summary; a full --pages run is
+// also saved as results.full-pages.json / report.full-pages.txt.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -91,5 +92,12 @@ const out = path.resolve(values.out);
 fs.mkdirSync(out, { recursive: true });
 fs.writeFileSync(path.join(out, "report.txt"), lines.join("\n") + "\n");
 fs.writeFileSync(path.join(out, "results.json"), JSON.stringify(results, null, 1) + "\n");
+// A full page run (~28 min) is also kept under its own name, so later runs (which overwrite
+// results.json) can be compared with it entry by entry.
+const fullPages = values.pages && !values.map && !values.ce && !values["rerun-unexplained"];
+if (fullPages) {
+  fs.writeFileSync(path.join(out, "results.full-pages.json"), JSON.stringify(results, null, 1) + "\n");
+  fs.writeFileSync(path.join(out, "report.full-pages.txt"), lines.join("\n") + "\n");
+}
 console.log(lines.slice(0, lines.indexOf(`## Unexplained (${groups.size} distinct; ranked by how many runs)`) + 16).join("\n"));
 console.log(`\n(full report: ${path.relative(process.cwd(), path.join(out, "report.txt"))})`);

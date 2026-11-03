@@ -74,7 +74,20 @@ npm run crosscheck -- --map 29              # one map's pages
 npm run crosscheck -- --rerun-unexplained   # only entries that had unexplained changes last time
 ```
 
-Reports go to `out/crosscheck/`. Verdicts are explained in DECISIONS "Runtime cross-check".
+Reports go to `out/crosscheck/`; a full `--pages` run also keeps `results.full-pages.json` /
+`report.full-pages.txt` for comparing later runs against. Verdicts are explained in DECISIONS "Runtime cross-check".
+
+### Plugin command reviews: `npm run plugins`
+
+Every plugin command the index handles was reviewed against its handler's code. This checks that
+the reviews are still current: it lists handlers (or their plugin files) that changed since their
+review, and plugin commands used in events that have no verdict.
+
+```sh
+npm run plugins                              # report; exit 1 if anything needs review
+npm run plugins -- --accept books:readBook   # record a fresh review of these commands
+npm run plugins -- --accept-all              # record all (only after reviewing them all)
+```
 
 ### Headless harness: `npm run harness`
 

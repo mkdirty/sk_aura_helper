@@ -18,7 +18,8 @@
     "print": "tsx src/cli/print.ts",
     "where": "tsx src/cli/where.ts",
     "index": "tsx src/cli/index.ts",
-    "crosscheck": "tsx src/cli/crosscheck.ts"
+    "crosscheck": "tsx src/cli/crosscheck.ts",
+    "plugins": "tsx src/cli/plugins.ts"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",
