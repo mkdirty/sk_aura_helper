@@ -38,12 +38,13 @@ entry when it merges, moving what it adds into the table):
   24,162 lists in ~1.3 s, 223,614 commands run on some path, 268,033 edges, 19 unreachable
   commands (all in Skip blocks), 73 stale edges; coverage report in `out/cfg/`, split into
   findings (8, all reviewed in `src/graph/cfg-review.json`: 4 game bugs, 4 harmless) and notes.
-  19 new tests (53 in all), with hand-checked snapshots of Map265/E8 p0 and CE11.
+  19 new tests (53 in all), with hand-checked snapshots of Map265/E8 p0 and CE11. Ready to
+  merge; the user hasn't yet said whether to merge before starting M2 or continue on the branch.
 
 | Tool | State |
 | --- | --- |
 | Harness | Boots in ~0.25s with all 143 plugins; runs common events and map pages; all 7 Map050 author tests pass |
-| Decoder | 23,748 lists / 458,065 commands in ~2s, **0 gaps**, 2 anomalies (Map271/E28); CE11 and Map265/E8 are hand-checked snapshots |
+| Decoder | 24,179 lists / 460,751 commands in ~2s (game 1.5.0-prerelease-3; the CFG's 24,162 excludes the template map's own lists), **0 gaps**, 2 anomalies (Map271/E28); CE11 and Map265/E8 are hand-checked snapshots |
 | Index | ~112k references in ~2.5s. Plugin commands: 42 modelled, 60 checked to have no effect, 1 unanalyzed (unused `openSceneDatabase`); all 103 recorded in `plugin-review.json` |
 | Cross-check | **0 unexplained** on every entry point (first full run: 3,502). Pages: 10,738 runs, 41,917 changes (31,055 explained, 10,786 visited-map, 76 dynamic), ~27 min. Common events: 551 runs, 1,703 changes (1,605 / 80 / 18), ~5s. Re-run after the harness boot fix (2026-11-02): identical totals (see open items) |
 | Tests | 34 passing (`npm test`, ~4s) |

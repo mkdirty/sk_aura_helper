@@ -65,5 +65,9 @@ Each file holds one kind of thing. Put new information where it belongs:
   *before* adding her (adding first recurses forever via MPP). `startGameInProgress()` in
   `src/harness/trace.ts` does this. Many common events need caller-provided arguments, so map
   pages are better entry points.
+- **Checking one path through a long page:** set the state the path needs, `interpreter.setup(list,
+  eventId)` on `$gameMap._interpreter`, then set `interpreter._index` to the label or command to
+  start from, and wrap `Game_Interpreter.prototype.executeCommand` to log `_index` for that list
+  (how the Map265/E28 p3 trial bug was confirmed). Keep such scripts in `experiments/`.
 - **Errors thrown by game code** come from the vm realm: `instanceof Error` fails, so use duck
   typing (`e?.message`).

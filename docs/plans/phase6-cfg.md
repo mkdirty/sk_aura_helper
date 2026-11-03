@@ -5,6 +5,9 @@
 > DECISIONS "How the graph is built and answers are given". Where they differ from this plan
 > (configuration left open, not assumed ON; Erase Event means once per map visit), DECISIONS wins.
 > Line numbers cite the code as of commit `5df4220`.
+> **M1 is built (branch `cfg`)** and differs from 3.1: the CFG comes from abstract interpretation
+> of the raw list with the engine's branch state, not from the decoded tree (see DECISIONS and
+> ARCHITECTURE "Control-flow graphs"); and findings vs notes are split with recorded reviews.
 
 This plan is based on reading the docs, all of `src/` and `test/`, the engine (`game/js/rmmz_objects.js`) and the relevant plugins, plus read-only runs of `where`, `print` and small `node`/`tsx` scans over `game/data`. I changed no files. Example CLI outputs in section 4 are mock-ups: every fact in them was checked against the data, but the formatting is a proposal.
 
