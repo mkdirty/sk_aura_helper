@@ -31,8 +31,8 @@ REPL over real saves. See ARCHITECTURE "Planned components".
 
 ## Status (2026-11-02)
 
-`main` holds phases 1–5 (including NG+, the harness boot fix and the plugin review snapshot);
-no branch is pending a merge.
+The table below describes `main`. **Open branches** (what each adds beyond `main`; remove the
+entry when it merges): none.
 
 | Tool | State |
 | --- | --- |

@@ -32,10 +32,10 @@ Each file holds one kind of thing. Put new information where it belongs:
 - `game/` is read-only. Generated output goes to gitignored `out/`.
 - Work on branches; merge into `main` with `--ff-only` when the user asks. Commit only when asked;
   push after every commit (standing permission).
-- **Docs follow state changes without asking.** When a merge, branch or other step makes a doc
-  stale (e.g. ROADMAP's "Status" naming a pending branch), update it in the same commit when
-  possible: commit it on the branch before a merge. If it's caught only afterwards, make a
-  docs-only commit and push it straight away. Don't ask permission first.
+- **Check the docs before every commit, branch or merge.** First check whether the step makes any
+  doc stale, e.g. ROADMAP's open-branches list (add a branch when it's created, remove it on merge)
+  or its status table. Update them in that commit, or on the branch before merging. No need to ask
+  permission for these updates.
 - Prefer reading the game's own code over guessing: engine semantics are in
   `game/js/rmmz_objects.js`, and plugins in `game/js/plugins/` (enabled list: `js/plugins.js`).
 
