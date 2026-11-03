@@ -45,8 +45,8 @@ entry when it merges): none.
 ## Next steps
 
 1. **Control-flow graph and requirement tracing:** the step toward "earliest I can learn Fire I".
-   **Plan: [plans/phase6-cfg.md](plans/phase6-cfg.md)** (proposal awaiting the user's review;
-   answer its open questions before M1).
+   **Plan: [plans/phase6-cfg.md](plans/phase6-cfg.md).** Its open questions are answered in
+   DECISIONS; its proposed decisions (8.3) are not yet agreed.
    Labels and jumps cross blocks (Map265/E8 jumps into a choice branch); page priority makes lower
    pages missable. Book prerequisites (`<idkcheck>` JS on book items, e.g. The Art Of Fire needs a
    Fire rank) are requirements this will need.

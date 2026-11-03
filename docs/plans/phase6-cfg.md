@@ -1,8 +1,9 @@
 # Phase 6 plan: control-flow graph and requirement tracing
 
-> **Status: proposal, not yet reviewed by the user (2026-11-02).** Written by a planning subagent.
-> Its open questions (8.2) and proposed decisions (8.3) are unanswered; agreed decisions move to
-> DECISIONS.md. Line numbers cite the code as of commit `5df4220`.
+> **Status: proposal (2026-11-02).** Written by a planning subagent. The open questions (8.2) are
+> answered in DECISIONS "Query defaults for `needs`" (one answer differs: configuration is left
+> open and labelled, not assumed ON). The proposed decisions (8.3) are not yet agreed; agreed ones
+> move to DECISIONS.md. Line numbers cite the code as of commit `5df4220`.
 
 This plan is based on reading the docs, all of `src/` and `test/`, the engine (`game/js/rmmz_objects.js`) and the relevant plugins, plus read-only runs of `where`, `print` and small `node`/`tsx` scans over `game/data`. I changed no files. Example CLI outputs in section 4 are mock-ups: every fact in them was checked against the data, but the formatting is a proposal.
 
@@ -653,6 +654,8 @@ Total ~4,900 lines. That is about as much code again as the repo has today (~5.5
 - **Harness overhead** of hooking `executeCommand` on the 28-minute full run; measure it, and sample if needed.
 
 ### 8.2 Open questions for the user
+
+**Answered (2026-11-02):** see DECISIONS "Query defaults for `needs`".
 
 1. Skill goals: default to Aura (actor 1), or "any party member" with the actor shown?
 2. Should NG+ ways be excluded by default and listed in a footer (consistent with "New Game+ is a playthrough boundary")?

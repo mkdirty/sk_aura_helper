@@ -207,3 +207,37 @@ precision. Verdicts:
 Map event pages are the main entry points: many common events need caller-provided arguments and
 crash when run alone. `--rerun-unexplained` makes the fix loop take seconds instead of the full
 ~28-minute page run.
+
+## Requirement tracing (phase 6)
+
+### Query defaults for `needs` (2026-11-02)
+
+The answers to the open questions in [plans/phase6-cfg.md](plans/phase6-cfg.md) 8.2. These are
+query defaults, not route semantics (still deferred): every default is overridable, and every
+answer prints the assumptions it relied on.
+
+- **Skill goals default to Aura (actor 1).** `--actor N` picks another; ways that only give the
+  skill to other actors are listed in a footer. Most questions are about the protagonist, and
+  skills belong to actors, so "any party member" would mix answers that don't transfer.
+- **NG+ ways are excluded and listed in a footer** (`--ngplus` includes them). Follows from "New
+  Game+ is a playthrough boundary".
+- **Configuration is not assumed (refines the plan's proposal of "adult content ON").** Atoms for
+  the adult-content setting (S9) and difficulty are left open: a way that depends on one is still
+  shown, labelled with the setting it needs ("only with adult content ON"). `--assume` fixes them.
+  Picking a default would bake in a route choice, which is deferred; labelling keeps answers valid
+  for every route.
+- **Dev maps are excluded by default** (Map012 Palette, Map019/020/050 tests, CE5 `startTest`;
+  `--dev` includes them). They aren't reachable content. The list is explicit in code, with this
+  reason, because nothing in the data marks them; a test fails if a listed map becomes reachable
+  from the start map.
+- **Ranking, until the day model (phase 7) exists:** end-of-day count, then battles, then random
+  outcomes, then assumptions, then player actions, compared in that order. Provisional: it only
+  orders the output; route tiebreakers are deferred.
+- **Untracked conditions (MP, stats, level, book progress) are treated as satisfiable and
+  listed.** Blocking on them would make most of the game look unreachable. Ways with fewer
+  assumptions rank first among equals.
+- **Battles:** a win is assumed possible. A lose branch (battle with "can lose") is a way of its
+  own, marked `battle: lose`; losing without one is a game over and never a way. Random outcomes
+  (drops, random variables) are assumed to happen eventually and marked `random`.
+- **Cache:** JSON/NDJSON in `out/graph/`, keyed by a hash of the game data, enabled plugins and
+  tool version. SQLite only if the public site (phase 9) needs it.
