@@ -31,9 +31,8 @@ REPL over real saves. See ARCHITECTURE "Planned components".
 
 ## Status (2026-11-02)
 
-`main` holds phases 1–4 and crafting/books/blessing. Branch `ngplus` (pushed, not yet merged)
-adds NG+, the harness boot fix and the plugin review snapshot; the user merges into `main` with
-`--ff-only` when asked.
+`main` holds phases 1–5 (including NG+, the harness boot fix and the plugin review snapshot);
+no branch is pending a merge.
 
 | Tool | State |
 | --- | --- |
