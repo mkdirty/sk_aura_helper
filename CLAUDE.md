@@ -19,6 +19,7 @@ Each file holds one kind of thing. Put new information where it belongs:
 | How a component works | `docs/ARCHITECTURE.md` |
 | A fact about the game (incl. bugs found) | `docs/GAME-NOTES.md` |
 | How to use a command | `README.md` |
+| A plan for a phase (proposal until agreed) | `docs/plans/` |
 | How to work on the repo | this file |
 
 ## Conventions

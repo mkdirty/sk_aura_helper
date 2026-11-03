@@ -45,6 +45,8 @@ entry when it merges): none.
 ## Next steps
 
 1. **Control-flow graph and requirement tracing:** the step toward "earliest I can learn Fire I".
+   **Plan: [plans/phase6-cfg.md](plans/phase6-cfg.md)** (proposal awaiting the user's review;
+   answer its open questions before M1).
    Labels and jumps cross blocks (Map265/E8 jumps into a choice branch); page priority makes lower
    pages missable. Book prerequisites (`<idkcheck>` JS on book items, e.g. The Art Of Fire needs a
    Fire rank) are requirements this will need.
@@ -53,6 +55,8 @@ entry when it merges): none.
 
 ## Open items
 
+- **`where --json` truncates output at 65,536 bytes** when the reader is slow:
+  `console.log` then `process.exit` (src/cli/where.ts). Upgrade U10 in the phase 6 plan.
 - **Report to the author (the user's call):** Troop245 page 1 uses the unregistered
   `ska_compendium::revealTrait`, so enemy 112's "sluggish" trait is never revealed there (see
   GAME-NOTES "Bugs and quirks").
