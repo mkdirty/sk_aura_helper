@@ -304,3 +304,22 @@ The game already records what the player has seen, which a "see all content" rou
   keys are stringified.
 - `auramz/autosave::autosaveNow` (3 uses) has no plugin; it does nothing.
 - Map271/E28 is missing a 412 closer (harmless; see [Event data](#event-data)).
+- **Missing and duplicate labels** (found by the CFG; a jump to a missing label does nothing, a
+  duplicate label sends every jump to the first). Not yet reported to the author. Likely bugs:
+  - **Map175/E22 p0 (dice game):** two `PLAYER_DEALER_ROLL` labels (#368 in the branch with a
+    dealer, #441 in the one without). Entering an invalid die number in the second branch (#478,
+    #485) jumps back to the *first* branch's prompt, which also shows the dealer's result line.
+    Both branches then continue at `COMPUTE_ROLL_RESULT`, so only the message is wrong.
+  - **Map109/E4 p4 (Hermann):** `if adult content OFF: jump EndLewdScene` (#134), but the page has
+    no labels. With adult content off the kiss scene's dialogue still plays (its CGs are guarded
+    separately by S9).
+  - **Map265/E28 p3 (Lorraine's trial, autorun):** after Marie's second chance (#663) it jumps to
+    `post_penalty`, which this page lacks (the other six trial pages have it: E28 p1, E29 p1/p3/p5,
+    E30 p3/p5). The page runs to its end instead of continuing with the hint and the retry;
+    being autorun, it then restarts from the top. Effect not yet confirmed in the harness.
+  - **Map214/E19 p0 (Roland):** "Anything else?" then `jump MAIN` (#338), which doesn't exist, so
+    the conversation ends instead of returning to the menu.
+  Harmless: CE11's two `END_DAY` (nothing jumps to them); CE1005's jump (#406) correctly reaches
+  the first `EndLewdScene` (the second, #768, is a leftover); Map109/E1 p8 "R-Refuse!!" jumps to a
+  missing `REFUSE` and so ends the conversation like "Not now"; Map244/E71 p0 `jump dontUse` does
+  the same as leaving.

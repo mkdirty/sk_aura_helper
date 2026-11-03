@@ -73,8 +73,13 @@ entry when it merges, moving what it adds into the table):
 - **`where --json` truncates output at 65,536 bytes** when the reader is slow:
   `console.log` then `process.exit` (src/cli/where.ts). Upgrade U10 in the phase 6 plan.
 - **Report to the author (the user's call):** Troop245 page 1 uses the unregistered
-  `ska_compendium::revealTrait`, so enemy 112's "sluggish" trait is never revealed there (see
-  GAME-NOTES "Bugs and quirks").
+  `ska_compendium::revealTrait`, so enemy 112's "sluggish" trait is never revealed there; and four
+  missing/duplicate-label bugs found by the CFG (Map175/E22 dice prompt, Map109/E4 adult-content
+  skip, Map265/E28 p3 trial retry, Map214/E19 menu loop). See GAME-NOTES "Bugs and quirks".
+- **CFG coverage report mixes notes with findings:** "jump enters a block", "dynamic jump" and
+  "unreachable commands" record handled cases; missing/duplicate labels are possible game bugs.
+  Split the report into "findings" and "notes", and let reviewed findings be marked as known (as
+  `plugin-review.json` does for plugin commands) so new ones stand out after a game update.
 - **Boot fix vs cross-check (2026-11-02):** until the fix, every harness run skipped the plugin
   processing done in `Scene_Boot.start` wrappers (passive skills, database inheritance, dynamic
   prices, artifacts, stance/enhance skills, NG+ skills). Re-running both cross-checks afterwards
