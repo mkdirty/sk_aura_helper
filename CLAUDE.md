@@ -50,8 +50,8 @@ Each file holds one kind of thing. Put new information where it belongs:
   `npm run crosscheck -- --rerun-unexplained` (seconds). Record what the fix taught in
   GAME-NOTES / ARCHITECTURE. Run `--pages` in the background with output to a log, and before
   reading results confirm it really finished (the log/report header says "10738 runs" or so;
-  background-task notices have fired early). Compare against the previous
-  `results.full-pages.json` before overwriting it matters.
+  background-task notices have fired early). The run overwrites `results.full-pages.json`, so
+  copy the previous one aside first if you want an entry-level comparison.
 - **Harness runs need a game in progress:** new game, CE16 `initGame`, then construct actor 1
   *before* adding her (adding first recurses forever via MPP). `startGameInProgress()` in
   `src/harness/trace.ts` does this. Many common events need caller-provided arguments, so map
