@@ -19,7 +19,8 @@
     "where": "tsx src/cli/where.ts",
     "index": "tsx src/cli/index.ts",
     "crosscheck": "tsx src/cli/crosscheck.ts",
-    "plugins": "tsx src/cli/plugins.ts"
+    "plugins": "tsx src/cli/plugins.ts",
+    "cfg": "tsx src/cli/cfg.ts"
   },
   "devDependencies": {
     "@types/node": "^22.20.5",

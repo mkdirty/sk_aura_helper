@@ -87,7 +87,9 @@ IDs follow the tools' notation: `S22` switch, `V31` variable, `CE11` common even
 - **109 "Skip" is a block** (109 … 409) whose body never runs: the editor's way of commenting out
   code (e.g. CE163, CE308, CE574). Writes inside it never happen.
 - **Labels and jumps cross block boundaries:** 491 labels, 604 jumps, 84 loops. Map265/E8 jumps
-  into a choice branch. CE11 has two `END_DAY` labels, one alone inside a nested `if`.
+  into a choice branch. CE11 has two `END_DAY` labels, one alone inside a nested `if`; nothing
+  jumps to either. 5 jumps name missing labels (no-ops) and 3 lists have duplicate labels (the
+  first wins). See "How the interpreter branches" below.
 - **Page priority:** the highest-numbered page whose conditions hold runs, so content on lower
   pages becomes unreachable once a later page's conditions are met.
 - **Autonomous move routes:** 1,356 pages have a custom movement route (`page.moveRoute`) that runs
@@ -122,6 +124,34 @@ IDs follow the tools' notation: `S22` switch, `V31` variable, `CE11` common even
 - **Switch-gated parallel common events:** CE3 `addCollar` (S22), CE26 `manageCursedState` (S25),
   CE842 `AirDamage` (S68).
 - **Variable-target transfers:** 487 of 498 go to the recollection room (V640 `recollectionMap`).
+
+### How the interpreter branches (what the CFG follows)
+
+- **Branch state is per indent and outlives the construct.** 111/102/301 store a value in
+  `_branch[indent]`; 411/402/403/601–603 compare against it. `Game_Interpreter.clear()` doesn't
+  reset `_branch`, and the map, troop and parallel interpreters are reused, so a new run starts
+  with the previous run's values. A child interpreter (117 call) starts with `{}` (undefined).
+- **Jumping into a block is safe here:** `jumpTo` sets the state of every indent the jump crosses
+  to `null`, so the markers after the target skip and the run leaves the construct at the end of
+  the body. All 149 jumps that enter a block behave this way.
+- **403 (cancel branch) quirk:** it skips when `_branch >= 0`; `null >= 0` is true but
+  `undefined >= 0` is false, so on a fresh interpreter a stray 403 would enter its body.
+- **Text absorbs the next input command:** 101 runs a following 102/103/104 itself (and
+  `TLB_SKASelectSkill` absorbs a following select-skill plugin command); `text_utils`'
+  `setupNextEventCode` does the same after a plugin command. The indents always match.
+- **Choices map the selected row back by text** (`choices.js` `getChoiceIndex`): two options with
+  the same text would both select the first. No choice in the game has duplicate texts.
+- **`setHideSingleOptionChoices`:** with at most one visible option no choice window opens, no
+  branch is chosen, and the markers read the old state (Map189/E63 p2#41, the only use).
+- **Losing a battle without "can lose" doesn't always end the game:** `ska_battle`'s
+  `processDefeat` can revive the leader and continue with the lose result (2). Battles with a
+  troop from a variable or random may start no battle at all (72 of the 73 stale CFG edges).
+- **Escape without the escape command** happens through Abort Battle (340) in a troop page; no
+  item or skill has the escape effect.
+- **Computed jumps:** 49 scripts call `this.command119([...])` (Map265 Lorraine/François/Marie
+  interrogations: `` `lorraine_p${V30}` ``; Map214/E5: `ACCEPT_<quest title>`; Map032/E9 passes a
+  number, which never equals a label name, so it does nothing). Map005/E10 p0#191 ends every
+  running interpreter by setting `_index` to the list length.
 
 ## Where JavaScript lives
 

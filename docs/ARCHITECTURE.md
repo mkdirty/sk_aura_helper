@@ -10,6 +10,8 @@ game/ (data, js)
    │     │
    │     ├─ src/events ── decoder → op trees → printer (+ decoder coverage)
    │     │       │
+   │     │       ├─ src/graph ──── control-flow graph per list (+ dominators, loops, coverage)
+   │     │       │
    │     │       └─ src/analysis ── effects per op (+ scripts, plugins, database)
    │     │                │            → cross-reference index → where / index / symbols
    │     │                │
@@ -101,6 +103,45 @@ the event actually runs.
 - **Queries** (`src/cli/where.ts`): refs by entity, grouped by what happens, with the places that
   ultimately run a common event. `src/cli/index.ts` writes `symbols.json` and the unanalyzed report.
 
+## Control-flow graphs (`src/graph/`)
+
+Phase 6 of [plans/phase6-cfg.md](plans/phase6-cfg.md); milestone M1 is built.
+
+- **Builder** (`cfg.ts`): `buildCfg(source, list, cfgContext(data))` abstractly runs
+  Game_Interpreter's control logic over the *raw* list, not the decoded tree. The engine has no
+  blocks, only indentation and a per-indent branch state (`_branch[indent]`): openers (111, 102,
+  301) store a value, and the markers after them (411, 402/403, 601–603) compare it to decide
+  whether to enter their body or skip it (`skipBranch`). The builder explores (command index,
+  branch state) pairs and projects them onto command indices:
+  - Nodes are commands that do something (they have an interpreter handler and aren't markers).
+    Markers, closers, code 0 and continuation lines are resolved inside edges, so an edge goes
+    from one command that runs to the next.
+  - Edge kinds: `seq`, `then`/`else`, `choice` (with the option) / `cancel` / `noChoice`,
+    `win`/`escape`/`lose`/`noBattle`, `skip` (109), `jump`, `break`, `repeat`, `exit`; terminals
+    `EXIT`, `GAMEOVER`, `TITLE`.
+  - Branch-state values are tagged with the opener that set them. The entry state is unknown (a
+    reused interpreter keeps old state; a fresh one has `undefined`). An edge is `stale` when it is
+    only taken after a marker reads a value its own opener didn't set.
+  - **Liveness** keeps the exploration small: a backward pass over all possible successors finds
+    which indents' state can still be read; dead entries are dropped from states. About 1.01
+    states per command overall.
+  - Jumps follow `command119` (first label with the name; missing label = no-op) and `jumpTo`
+    (resets the state of every indent the jump crosses). Scripts calling `this.command119(...)`
+    are parsed with acorn: string literals, template literals and `const` bindings resolve to the
+    matching labels, plus a fallthrough for values that match none. A script setting an
+    interpreter's `_index` to its list length ends the event. Any other script touching
+    interpreter state is an issue (none in the game).
+  - `cfgContext` reads the interpreter handlers from the engine and enabled plugins, and which
+    troops can end in "escape" through Abort Battle (340 in their pages or the common events they
+    call).
+- **Analyses** (`cfg-analysis.ts`): basic blocks, cyclic SCCs (iterative Tarjan), immediate
+  dominators and post-dominators (Cooper–Harvey–Kennedy; post-dominators join every terminal in a
+  virtual `SINK`).
+- **Printing** (`cfg-print.ts`): text (blocks with op headers from the decoder), DOT, JSON, and
+  the whole-project coverage report (`out/cfg/coverage.txt`), ranked like the decoder's.
+- **Tests:** synthetic lists for each engine rule, a whole-project test that fails on unmodelled
+  interpreter tricks or a new kind of stale edge, and hand-checked snapshots (Map265/E8 p0, CE11).
+
 ## Headless harness (`src/harness/`)
 
 `Harness.boot()` builds a Node `vm` context and boots the game in it:
@@ -142,8 +183,8 @@ unexplained (see DECISIONS). Results go to `out/crosscheck/report.txt` and `resu
 
 ## Planned components
 
-- **Control-flow graph:** basic blocks with labels, jumps and loops (labels cross blocks), page
-  conditions as guards with page priority (later pages hide earlier ones).
+- **Requirement tracing** (rest of phase 6, see [plans/phase6-cfg.md](plans/phase6-cfg.md)):
+  harness trace check of the CFG, condition language, path conditions, world graph, `needs`.
 - **Day model and reachability:** day transitions, per-day resources, deadlines and the Reality
   clock. Requirement slicing (AND/OR trees) with page-priority intervals, random vs controllable
   edges. Eventually a lower bound on days from requirements and a concrete route as the upper

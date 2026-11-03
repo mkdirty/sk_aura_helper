@@ -247,12 +247,17 @@ answer prints the assumptions it relied on.
 Adopted from the plan's proposals ([plans/phase6-cfg.md](plans/phase6-cfg.md) 8.3), with the
 refinements noted.
 
-- **The CFG follows the interpreter, not the editor.** Nodes are raw command indices, built from
-  the decoded tree. A jump goes to the *first* label with that name; a missing label is a no-op;
-  Break Loop scans forward by 112/413 depth. The end of a branch body leaves the construct, also
-  after a jump into it, because `jumpTo` resets branch state. Why: the ~143 jumps that enter blocks
-  make lexical structure wrong, and the engine is ground truth. The jump claim is checked against
-  interpreter traces in the harness (M2) before anything builds on it.
+- **The CFG follows the interpreter, not the editor.** Nodes are raw command indices. A jump goes
+  to the *first* label with that name; a missing label is a no-op; Break Loop scans forward by
+  112/413 depth. Why: the 149 jumps that enter blocks make lexical structure wrong, and the engine
+  is ground truth. Checked against interpreter traces in the harness (M2) before anything builds
+  on it.
+  **Refined in M1 (2026-11-02): built by abstract interpretation of the raw list, not from the
+  decoded tree.** The engine's branch markers read a per-indent branch state that outlives its
+  construct and isn't cleared between runs, so "where does the end of this body go" depends on
+  state, not structure. The builder tracks that state (tagged with the opener that set it) and
+  derives the jump behaviour instead of assuming it; edges that read state their own opener didn't
+  set are marked `stale` rather than dropped. See ARCHITECTURE "Control-flow graphs".
 - **Requirements are necessary conditions; plans are relaxed.** A site's requirement must hold
   whenever the site runs, and the harness checks that. `needs` answers come from a model that
   ignores undoing (deletes), so they are labelled possible plans or lower bounds, with threats

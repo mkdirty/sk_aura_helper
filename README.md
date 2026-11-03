@@ -46,6 +46,26 @@ npm run print -- troop 5
 npm run print -- ce 11 --text first # dialogue: full (default), first line, or none
 ```
 
+### Control-flow graphs: `npm run cfg`
+
+The control-flow graph of each event command list, following the engine's interpreter: which
+command can run after which, through branches, choices, battles, loops, labels and jumps
+(including jumps computed by scripts).
+
+```sh
+npm run cfg                         # every list → out/cfg/coverage.txt / coverage.json (~1.3 s)
+npm run cfg -- ce 11                # one common event's graph as text
+npm run cfg -- map 265 8            # a map event's pages (add a page number for one page)
+npm run cfg -- troop 5 0
+npm run cfg -- map 265 8 0 --dot    # Graphviz (pipe into `dot -Tsvg`); --json for tools
+```
+
+The text form lists basic blocks (`#index command`) and their outgoing edges (`then`, `else`,
+`choice 1 "Leave."`, `win`, `jump present`, `repeat`, …). `END` is the end of the event,
+`GAME OVER` the game-over scene. Edges marked "stale branch state" are taken only when a choice or
+battle doesn't happen and a branch marker reads an old value; the coverage report counts them and
+ranks the issues found (jumps into blocks, computed jumps, missing labels, unreachable code).
+
 ### Where is X used: `npm run where`
 
 Every place the game reads, writes or calls something, from events, scripts, plugin commands
@@ -109,6 +129,7 @@ npm run harness -- handler selfswitches_utils:setLocalSelfSwitch   # a plugin co
 | `src/data/` | Static access to the game's data files |
 | `src/events/` | Event command decoder, pretty-printer, decoder coverage |
 | `src/analysis/` | Effects per command, script analysis, cross-reference index |
+| `src/graph/` | Control-flow graphs (and, later, requirement tracing) |
 | `src/harness/` | Headless engine |
 | `src/check/` | Runtime cross-check |
 | `src/cli/` | Command-line entry points |

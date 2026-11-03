@@ -32,7 +32,12 @@ REPL over real saves. See ARCHITECTURE "Planned components".
 ## Status (2026-11-02)
 
 The table below describes `main`. **Open branches** (what each adds beyond `main`; remove the
-entry when it merges): none.
+entry when it merges, moving what it adds into the table):
+
+- `cfg`: phase 6 milestone M1. Per-list control-flow graphs (`src/graph/`, `npm run cfg`): all
+  24,162 lists in ~1.3 s, 223,614 commands run on some path, 268,033 edges, 19 unreachable
+  commands (all in Skip blocks), 73 stale edges; coverage report in `out/cfg/`. 18 new tests
+  (52 in all), with hand-checked snapshots of Map265/E8 p0 and CE11.
 
 | Tool | State |
 | --- | --- |
@@ -46,7 +51,8 @@ entry when it merges): none.
 
 1. **Control-flow graph and requirement tracing:** the step toward "earliest I can learn Fire I".
    **Plan: [plans/phase6-cfg.md](plans/phase6-cfg.md)** (agreed; its decisions are in DECISIONS
-   "Requirement tracing"). Start at milestone M1 on a branch.
+   "Requirement tracing"). M1 (per-list CFG) is on branch `cfg`; next is **M2**: interpreter
+   attribution in the harness and the CFG trace check (`crosscheck --cfg`).
    Labels and jumps cross blocks (Map265/E8 jumps into a choice branch); page priority makes lower
    pages missable. Book prerequisites (`<idkcheck>` JS on book items, e.g. The Art Of Fire needs a
    Fire rank) are requirements this will need.
@@ -54,6 +60,15 @@ entry when it merges): none.
 3. **Map renderer**: independent; can start whenever something visual is wanted.
 
 ## Open items
+
+- **CFG over-approximations** (to narrow in later milestones):
+  - 72 stale `noBattle` edges: Battle Processing with a troop from a variable may start no
+    battle. Most variables hold known constants (e.g. Map071/E11: V36 is 28 or 55); M4's value
+    tracking can drop these.
+  - Battle Processing inside a common event is assumed to start a battle; if the common event
+    runs during a battle (called from a troop page) it does nothing. Per-list CFGs can't know the
+    caller; the world graph (M5) can.
+  - Choice options are all assumed selectable; enable/show conditions come in M3.
 
 - **`where --json` truncates output at 65,536 bytes** when the reader is slow:
   `console.log` then `process.exit` (src/cli/where.ts). Upgrade U10 in the phase 6 plan.
